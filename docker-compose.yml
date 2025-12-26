@@ -32,7 +32,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.paineldb.rule=Host(`paineldb.stesistemas.com`) || Host(`www.paineldb.stesistemas.com`)" # Troque pelo seu dominio ou subdominio
       - "traefik.http.routers.paineldb.entrypoints=websecure"
-      - "traefik.http.routers.paineldb.tls.certresolver=leresolver"
+      - "traefik.http.routers.paineldb.tls.certresolver=le"
       - "traefik.http.services.paineldb.loadbalancer.server.port=80"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.routers.paineldb-secure.rule=Host(`paineldb.stesistemas.com`) || Host(`www.paineldb.stesistemas.com`)" # Troque pelo seu dominio ou subdominio
@@ -66,7 +66,7 @@ services:
       - "traefik.http.routers.wsnode-https.service=wsnode-https"
       - "traefik.http.routers.wsnode-https.entrypoints=websecure"
       - "traefik.http.routers.wsnode-https.tls=true"
-      - "traefik.http.routers.wsnode-https.tls.certresolver=leresolver" 
+      - "traefik.http.routers.wsnode-https.tls.certresolver=le" 
       - "traefik.http.services.wsnode-https.loadbalancer.server.port=3001" 
 
   node:
@@ -96,7 +96,7 @@ services:
       - "traefik.http.routers.node-https.service=node-https"
       - "traefik.http.routers.node-https.entrypoints=websecure"
       - "traefik.http.routers.node-https.tls=true"
-      - "traefik.http.routers.node-https.tls.certresolver=leresolver" 
+      - "traefik.http.routers.node-https.tls.certresolver=le" 
       - "traefik.http.services.node-https.loadbalancer.server.port=3000" 
   
     
