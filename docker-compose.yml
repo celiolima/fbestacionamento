@@ -13,9 +13,12 @@ services:
       MYSQL_PASSWORD: root
       MYSQL_ROOT_PASSWORD: root
     restart: always
+    networks:
+      - jbjuaz
 
   phpmyadmin:
     image: phpmyadmin:latest 
+    container_name: phpmyadmin    
     depends_on:
       - mysql
     ports:
@@ -34,10 +37,9 @@ services:
       - "traefik.http.routers.paineldb.entrypoints=websecure"
       - "traefik.http.routers.paineldb.tls.certresolver=le"
       - "traefik.http.services.paineldb.loadbalancer.server.port=80"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
-      - "traefik.http.routers.paineldb-secure.rule=Host(`paineldb.stesistemas.com`) || Host(`www.paineldb.stesistemas.com`)" # Troque pelo seu dominio ou subdominio
-      - "traefik.http.routers.paineldb-secure.entrypoints=web"
-      - "traefik.http.routers.paineldb-secure.middlewares=redirect-to-https"
+      - "traefik.http.routers.pma.tls=true"
+    networks:
+      - jbjuaz
 
   
   wsnode:
@@ -68,46 +70,94 @@ services:
       - "traefik.http.routers.wsnode-https.tls=true"
       - "traefik.http.routers.wsnode-https.tls.certresolver=le" 
       - "traefik.http.services.wsnode-https.loadbalancer.server.port=3001" 
+    networks:
+      - jbjuaz
+
 
   node:
     depends_on:
       - mysql
       - wsnode
-    build: ./app 
+    build: ./app_node
     restart: always
     env_file: ./.env  
     volumes:
-      - volume_jbjuaz:/app
-      - volume_wsjbjuaz_fotos:/app/public/uploads/car     
+      - volume_jbjuaz:/app_node
+      - volume_wsjbjuaz_fotos:/app_node/public/uploads/car     
     ports:
       - '3000:3000'  
     stdin_open: true
     tty: true  
     labels:
       # Rota HTTP para redirecionar para HTTPS
-      - "traefik.http.routers.node-http.rule=Host(`fbjuaz.stesistemas.com`)"
+      - "traefik.http.routers.node-http.rule=Host(`app.stesistemas.com`)"
       - "traefik.http.routers.node-http.service=node-http"
       - "traefik.http.routers.node-http.entrypoints=web"
       - "traefik.http.routers.node-http.middlewares=https-redirect"
       - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
       # Rota HTTPS normal
       - "traefik.enable=true"
-      - "traefik.http.routers.node-https.rule=Host(`fbjuaz.stesistemas.com`)" #Coloque o Seu Dominio do node Aqui
+      - "traefik.http.routers.node-https.rule=Host(`app.stesistemas.com`)" #Coloque o Seu Dominio do node Aqui
       - "traefik.http.routers.node-https.service=node-https"
       - "traefik.http.routers.node-https.entrypoints=websecure"
       - "traefik.http.routers.node-https.tls=true"
       - "traefik.http.routers.node-https.tls.certresolver=le" 
       - "traefik.http.services.node-https.loadbalancer.server.port=3000" 
+    networks:
+      - jbjuaz
   
-    
-networks:
-  default:
-    name: jbjuaz
+  
+  php-app:
+    #image: php:7.4-apache
+    build:      
+      context: ./app_php
+      dockerfile: Dockerfile
+    container_name: php-app
+    depends_on:
+      - mysql
+      - wsnode
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      # Corrigido o caminho interno: o Apache busca em /var/www/html
+      - "volume_php_jbjuaz_app:/var/www/html"
+    networks:
+      - jbjuaz
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_DATABASE=estacionamento_mysql
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpapp.rule=Host(`fbjuaz.stesistemas.com`)"
+      - "traefik.http.routers.phpapp.entrypoints=websecure"
+      - "traefik.http.routers.phpapp.tls=true"
+      - "traefik.http.routers.phpapp.tls.certresolver=le"
+      
+      # INSTRUÇÃO PARA O TRAEFIK:
+      # A imagem php:7.4-apache roda internamente na porta 80
+      - "traefik.http.services.phpapp.loadbalancer.server.port=80"
+      
+    #command: >
+    #  sh -c "docker-php-ext-install pdo pdo_mysql && apache2-foreground"
+      
+
+
+networks: 
+  jbjuaz:
     external: true
 
 volumes:
+  volume_php_jbjuaz_app:
+    external: true
   volume_db_data_jbjuaz:
+    external: true
   volume_wsjbjuaz:
+    external: true
   volume_wsjbjuaz_fotos:
+    external: true
   volume_jbjuaz:
+    external: true
 
