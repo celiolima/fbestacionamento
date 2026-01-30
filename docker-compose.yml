@@ -142,7 +142,7 @@ services:
       
     #command: >
     #  sh -c "docker-php-ext-install pdo pdo_mysql && apache2-foreground"
-      
+    #
 
 
 networks: 
