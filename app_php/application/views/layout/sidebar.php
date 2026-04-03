@@ -24,18 +24,27 @@
                     <a title="Listar mensalistas" href="<?php echo base_url('mensalistas'); ?>"><i class="fas fa-users"></i><span>Mensalistas</span></a>
                 </div>
 
+                 <div class="nav-lavel">Contador</div>
+                <div class="nav-item active">
+                    <a title="Contador" href="<?php echo base_url('contador'); ?>"><i class="fas fa-fw fa-tachometer-alt"></i><span>Contador</span></a>
+                </div>
+                <div class="nav-item">
+                    <a title="Galeria" href="<?php echo base_url('galeria'); ?>"><i class="fas fa-solid fa-images"></i><span>Galeria</span></a>
+                </div>
+               
+
                 <?php if ($this->ion_auth->is_admin()): ?>
+                    <div class="nav-lavel">Administração</div>                
 
-                    <div class="nav-item">
-                        <a title="Gerenciar mensalidades" href="<?php echo base_url('mensalidades'); ?>"><i class="fas fa-hand-holding-usd"></i><span>Mensalidades</span></a>
-                    </div>
-
-                    <div class="nav-lavel">Administração</div>
+                    
                     <div class="nav-item">
                         <a title="Listar usuários" href="<?php echo base_url('usuarios'); ?>"><i class="ik ik-users"></i><span>Usuários</span></a>
                     </div>
                     <div class="nav-item">
                         <a title="Gerenciar configurações do sistema" href="<?php echo base_url('sistema'); ?>"><i class="ik ik-settings"></i><span>Sistema</span></a>
+                    </div>
+                      <div class="nav-item">
+                        <a title="Gerenciar mensalidades" href="<?php echo base_url('mensalidades'); ?>"><i class="fas fa-hand-holding-usd"></i><span>Mensalidades</span></a>
                     </div>
                     <div class="nav-item">
                         <a title="Gerenciar preços e categorias" href="<?php echo base_url('precificacoes'); ?>"><i class="fas fa-file-invoice-dollar"></i><span>Precificação</span></a>
@@ -44,7 +53,8 @@
                         <a title="Gerenciar formas de pagamento" href="<?php echo base_url('pagamentos'); ?>"><i class="fas fa-money-bill-alt"></i><span>Forma de pagamento</span></a>
                     </div>
 
-                <?php endif; ?>
+                <?php
+endif; ?>
 
             </nav>
         </div>

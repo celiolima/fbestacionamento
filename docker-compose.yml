@@ -121,7 +121,10 @@ services:
       - "8080:80"
     volumes:
       # Corrigido o caminho interno: o Apache busca em /var/www/html
-      - "volume_php_jbjuaz_app:/var/www/html"
+      - "volume_php_jbjuaz_app:/var/www/html"  # em produção
+      #- ./app_php:/var/www/html                # em desenvolvimento
+      #- volume_wsjbjuaz_fotos:var/www/html/app_php/public/uploads 
+      #- ./app_php/public/uploads:var/www/html/app_php/public/uploads 
     networks:
       - jbjuaz
     environment:
