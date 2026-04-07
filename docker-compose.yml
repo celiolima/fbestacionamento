@@ -49,12 +49,13 @@ services:
     restart: always
     env_file: ./.env  
     volumes:
-      - volume_wsjbjuaz:/app 
+      # DESENVOLVIMENTO: mapeia código local diretamente
+      - ./websockt:/app:cached
       - volume_wsjbjuaz_fotos:/app/public/uploads/car    
     ports:
       - '9090:3001'  
     stdin_open: true
-    tty: true  
+    tty: true
     labels:
       # Rota HTTP para redirecionar para HTTPS
       - "traefik.http.routers.wsnode-http.rule=Host(`wsjuazeiro.stesistemas.com`)"
@@ -82,12 +83,13 @@ services:
     restart: always
     env_file: ./.env  
     volumes:
-      - volume_jbjuaz:/app_node
+      # DESENVOLVIMENTO: mapeia código local diretamente  
+      - ./app_node:/app_node:cached
       - volume_wsjbjuaz_fotos:/app_node/public/uploads/car     
     ports:
       - '3000:3000'  
     stdin_open: true
-    tty: true  
+    tty: true
     labels:
       # Rota HTTP para redirecionar para HTTPS
       - "traefik.http.routers.node-http.rule=Host(`app.stesistemas.com`)"
@@ -120,11 +122,10 @@ services:
     ports:
       - "8080:80"
     volumes:
-      # Corrigido o caminho interno: o Apache busca em /var/www/html
-      #- "volume_php_jbjuaz_app:/var/www/html"  # em produção
-      - ./app_php:/var/www/html                # em desenvolvimento
-      #- volume_wsjbjuaz_fotos:var/www/html/app_php/public/uploads 
-      #- ./app_php/public/uploads:var/www/html/app_php/public/uploads 
+      # DESENVOLVIMENTO: mapeia código local diretamente
+      - ./app_php:/var/www/html:cached  # cached para melhor performance
+      # Opcional: volume separado para uploads se necessário
+      # - ./app_php/public/uploads:/var/www/html/public/uploads:delegated
     networks:
       - jbjuaz
     environment:
@@ -153,14 +154,13 @@ networks:
     external: true
 
 volumes:
-  volume_php_jbjuaz_app:
-    external: true
+  # Apenas volumes necessários que não são de desenvolvimento
   volume_db_data_jbjuaz:
-    external: true
-  volume_wsjbjuaz:
     external: true
   volume_wsjbjuaz_fotos:
     external: true
-  volume_jbjuaz:
-    external: true
+  # Volumes de desenvolvimento removidos (usamos bind mounts locais)
+  # volume_php_jbjuaz_app: - REMOVIDO
+  # volume_wsjbjuaz: - REMOVIDO  
+  # volume_jbjuaz: - REMOVIDO
 
