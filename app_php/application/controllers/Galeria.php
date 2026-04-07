@@ -33,6 +33,7 @@ class Galeria extends CI_Controller
             'info_pagina_atual' => 'Bem vindo ao STE Park!',
             'pagina_atual' => 'Galeria',
             'icone_pagina' => 'ik-home',
+            'exclude_theme_js' => true, // Excluir theme.js na galeria para evitar erro do PerfectScrollbar
             'styles' => array(
                 'dist/css/galeria.css'
             ),
