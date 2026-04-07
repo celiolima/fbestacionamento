@@ -136,12 +136,19 @@ if ($arquivos)
     function abrirLightbox(src) {
         const lb = document.getElementById('lightbox');
         const lbImg = document.getElementById('img-lightbox');
-        lbImg.src = src; // Define a imagem clicada como fonte
-        lb.style.display = 'flex'; // Exibe o container
+        if (lb && lbImg) {
+            lbImg.src = src; // Define a imagem clicada como fonte
+            lb.style.display = 'flex'; // Exibe o container
+        } else {
+            console.error('Elementos do lightbox não encontrados');
+        }
     }
 
     function fecharLightbox() {
-        document.getElementById('lightbox').style.display = 'none';
+        const lb = document.getElementById('lightbox');
+        if (lb) {
+            lb.style.display = 'none';
+        }
     }
 
     // Fechar ao apertar a tecla ESC

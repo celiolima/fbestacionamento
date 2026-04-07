@@ -67,7 +67,7 @@
 <!-- <script src="<?php echo base_url('/public/src/js/vendor/modernizr2.8.3.min.js'); ?>"></script> -->
 <!-- jQuery completo para suportar animações -->
 <script
-    src="https://code.jquery.com/jquery-3.7.1.min.js"
+    src="https://code.jquery.com/jquery-3.7.1.min.js?v=<?php echo time(); ?>"
     integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
     crossorigin="anonymous"></script>
 <script src="<?php echo base_url('/public/plugins/popper.js/dist/umd/popper.min.js'); ?>"></script>
@@ -88,8 +88,8 @@
 <?php if (!isset($exclude_theme_js) || !$exclude_theme_js): ?>
     <script src="<?php echo base_url('/public/dist/js/theme-fix.js'); ?>"></script>
     <script src="<?php echo base_url('/public/dist/js/theme.min.js'); ?>"></script>
+    <script src="<?php echo base_url('/public/dist/js/util.js'); ?>"></script>
 <?php endif; ?>
-<script src="<?php echo base_url('/public/dist/js/util.js'); ?>"></script>
 </body>
 
 </html>
