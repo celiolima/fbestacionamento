@@ -107,12 +107,7 @@ if ($arquivos)
                                     </div>
                                 </form>
 
-                                <p style="text-align:center;"><a href="<?php echo base_url('uploadPictury'); ?>"">Fazer novo Upload</a></p>
-                            </div>
-
-                            <div id=" lightbox" onclick="fecharLightbox()">
-                                        <span class="fechar-lightbox">&times;</span>
-                                        <img id="img-lightbox" src="" alt="Ampliada">
+                                <p style="text-align:center;"><a href="<?php echo base_url('uploadPictury'); ?>">Fazer novo Upload</a></p>
                             </div>
 
                         </div>
@@ -125,34 +120,10 @@ if ($arquivos)
     </div>
 </div>
 
+<!-- Lightbox - movido para fora da estrutura principal para funcionar corretamente -->
+<div id="lightbox" onclick="fecharLightbox()">
+    <span class="fechar-lightbox">&times;</span>
+    <img id="img-lightbox" src="" alt="Ampliada">
+</div>
 
-<script>
-    // Selecionar todos os checkboxes
-    function toggleTodos(source) {
-        document.querySelectorAll('.foto-check').forEach(cb => cb.checked = source.checked);
-    }
 
-    // Funções do Lightbox
-    function abrirLightbox(src) {
-        const lb = document.getElementById('lightbox');
-        const lbImg = document.getElementById('img-lightbox');
-        if (lb && lbImg) {
-            lbImg.src = src; // Define a imagem clicada como fonte
-            lb.style.display = 'flex'; // Exibe o container
-        } else {
-            console.error('Elementos do lightbox não encontrados');
-        }
-    }
-
-    function fecharLightbox() {
-        const lb = document.getElementById('lightbox');
-        if (lb) {
-            lb.style.display = 'none';
-        }
-    }
-
-    // Fechar ao apertar a tecla ESC
-    document.addEventListener('keydown', (e) => {
-        if (e.key === "Escape") fecharLightbox();
-    });
-</script>

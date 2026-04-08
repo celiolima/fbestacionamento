@@ -37,6 +37,9 @@ class Galeria extends CI_Controller
             'styles' => array(
                 'dist/css/galeria.css'
             ),
+            'scripts' => array(
+                'dist/js/galeria.js'
+            ),
             'veiculos_estacionados' => $this->estacionar_model->get_all(),
             'numero_vagas_pequeno' => $this->estacionar_model->get_numero_vagas(1), // 1 = Carro pequeno
             'vagas_ocupadas_pequeno' => $this->core_model->get_all('estacionar', array('estacionar_status' => 0, 'estacionar_precificacao_id' => 1)),
