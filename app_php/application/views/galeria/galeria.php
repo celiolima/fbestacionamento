@@ -81,7 +81,7 @@ if ($arquivos)
                     <div class="card-body">
                         <div class="row">
                             <div class="container">
-                                <h2>📸 Minha Galeria2</h2>
+                                <h2>📸 Minha Galeria</h2>
                                 <?php if ($mensagem) echo "<p><strong>$mensagem</strong></p>"; ?>
 
                                 <form method="POST">
@@ -125,5 +125,3 @@ if ($arquivos)
     <span class="fechar-lightbox">&times;</span>
     <img id="img-lightbox" src="" alt="Ampliada">
 </div>
-
-

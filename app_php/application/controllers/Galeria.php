@@ -35,7 +35,8 @@ class Galeria extends CI_Controller
             'icone_pagina' => 'ik-home',
             'exclude_theme_js' => true, // Excluir theme.js na galeria para evitar erro do PerfectScrollbar
             'styles' => array(
-                'dist/css/galeria.css'
+                'dist/css/galeria.css',
+                'dist/css/home.css'
             ),
             'scripts' => array(
                 'dist/js/galeria.js'
