@@ -191,8 +191,7 @@ class UploadPictury extends CI_Controller
                         e.preventDefault();
 
                         const formData = new FormData(this);
-                        fetch("https://fbjuaz.stesistemas.com/uploadPictury", {
-                        //fetch("http://localhost:8080/uploadPictury", {
+                        fetch("https://fbjuaz.stesistemas.com/uploadPictury", {                       
                             method: "POST",
                             headers: {
                                 "Authorization": "Bearer token123",
