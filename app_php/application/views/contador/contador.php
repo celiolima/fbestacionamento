@@ -23,25 +23,25 @@
 
         <!-- FLASH MESSAGES -->
         <?php if ($message = $this->session->flashdata('info')): ?>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="alert bg-info alert-info text-black alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <span><i class="ik ik-alert-octagon"></i>&nbsp;&nbsp;<?php echo $message; ?></span>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert bg-info alert-info text-black alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <span><i class="ik ik-alert-octagon"></i>&nbsp;&nbsp;<?php echo $message; ?></span>
+                    </div>
                 </div>
             </div>
-        </div>
         <?php endif; ?>
 
         <?php if ($message = $this->session->flashdata('sucesso')): ?>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="alert bg-success alert-success text-white alert-dismissible">
-                    <button type="button" class="close" data-dismiss="alert">&times;</button>
-                    <span><i class="fas fa-check-circle"></i>&nbsp;&nbsp;<?php echo $message; ?></span>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert bg-success alert-success text-white alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <span><i class="fas fa-check-circle"></i>&nbsp;&nbsp;<?php echo $message; ?></span>
+                    </div>
                 </div>
             </div>
-        </div>
         <?php endif; ?>
 
         <!-- CARDS DE RESUMO -->
@@ -57,16 +57,16 @@
                             </div>
                             <div class="col pl-0">
                                 <h6 class="mb-5 text-navy f-15">Carros Mês</h6>
-                                <h6 class="mb-0 text-navy f-20"><?php echo $numero_total_vagas->total; ?></h6>
+                                <h6 class="mb-0 text-navy f-20"><?php echo $veiculos_qtd->total_carro_mes; ?></h6>
                             </div>
                         </div>
                         <div class="row align-items-center text-center">
                             <div class="col">
-                                <h6 class="mb-0">Livre&nbsp;<span class="badge badge-pill bg-navy text-white"><?php /* echo $numero_total_vagas->total - $total_estacionados_agora; */ ?></span></h6>
+                                <h6 class="mb-0">--<span class="badge badge-pill bg-navy text-white"><?php /* echo $numero_total_vagas->total - $total_estacionados_agora; */ ?></span></h6>
                             </div>
-                            <div class="col"><i class="fas fa-exchange-alt text-navy f-18"></i></div>
+                            <div class="col"><i class="fas fa-car fa-2x text-gray-300"></i></div>
                             <div class="col">
-                                <h6 class="mb-0">Ocupadas&nbsp;<span class="badge badge-pill bg-navy text-white"><?php /* echo $total_estacionados_agora; */ ?></span></h6>
+                                <h6 class="mb-0">--<span class="badge badge-pill bg-navy text-white"><?php /* echo $total_estacionados_agora; */ ?></span></h6>
                             </div>
                         </div>
                         <h6 class="pt-badge bg-navy small">STE Park</h6>
@@ -84,16 +84,16 @@
                             </div>
                             <div class="col pl-0">
                                 <h6 class="mb-5 f-15">Motos Mês</h6>
-                                <h6 class="mb-0 text-green f-20"><?php /* echo $total_mensalidades->total; */ ?>&mdash;</h6>
+                                <h6 class="mb-0 text-green f-20"><?php echo $veiculos_qtd->total_moto_mes; ?></h6>
                             </div>
                         </div>
                         <div class="row align-items-center text-center">
                             <div class="col">
-                                <h6 class="mb-0">Pagas <span class="badge badge-pill bg-success text-white"><?php /* echo $total_mensalidades_receber; */ ?></span></h6>
+                                <h6 class="mb-0">--<span class="badge badge-pill bg-success text-white"><?php /* echo $total_mensalidades_receber; */ ?></span></h6>
                             </div>
                             <div class="col"><i class="fas fa-motorcycle fa-2x text-gray-300"></i></div>
                             <div class="col">
-                                <h6 class="mb-0">Abertas <span class="badge badge-pill bg-success text-white"><?php /* echo $total_mensalidades_pagas; */ ?></span></h6>
+                                <h6 class="mb-0">-- <span class="badge badge-pill bg-success text-white"><?php /* echo $total_mensalidades_pagas; */ ?></span></h6>
                             </div>
                         </div>
                         <h6 class="pt-badge bg-green small">STEPark</h6>
@@ -111,16 +111,16 @@
                             </div>
                             <div class="col pl-0">
                                 <h6 class="mb-5 text-navy f-15">Total de Carros</h6>
-                                <h6 class="mb-0 text-navy f-20"><?php echo $numero_total_vagas->total; ?></h6>
+                                <h6 class="mb-0 text-navy f-20"><?php echo $veiculos_qtd->total_carro; ?></h6>
                             </div>
                         </div>
                         <div class="row align-items-center text-center">
                             <div class="col">
-                                <h6 class="mb-0">Livre&nbsp;<span class="badge badge-pill bg-navy text-white"><?php /* echo $numero_total_vagas->total - $total_estacionados_agora; */ ?></span></h6>
+                                <h6 class="mb-0">--<span class="badge badge-pill bg-navy text-white"><?php /* echo $numero_total_vagas->total - $total_estacionados_agora; */ ?></span></h6>
                             </div>
-                            <div class="col"><i class="fas fa-exchange-alt text-navy f-18"></i></div>
+                            <div class="col"><i class="fas fa-car fa-2x text-gray-300"></i></div>
                             <div class="col">
-                                <h6 class="mb-0">Ocupadas&nbsp;<span class="badge badge-pill bg-navy text-white"><?php /* echo $total_estacionados_agora; */ ?></span></h6>
+                                <h6 class="mb-0">--<span class="badge badge-pill bg-navy text-white"><?php /* echo $total_estacionados_agora; */ ?></span></h6>
                             </div>
                         </div>
                         <h6 class="pt-badge bg-navy small">STE Park</h6>
@@ -134,20 +134,20 @@
                     <div class="card-body text-green">
                         <div class="row align-items-center mb-30">
                             <div class="col-auto">
-                                <i class="fas fa-hand-holding-usd f-40"></i>
+                                <i class="fas fa-motorcycle fa-2x text-gray-300"></i>
                             </div>
                             <div class="col pl-0">
                                 <h6 class="mb-5 f-15">Total de Motos</h6>
-                                <h6 class="mb-0 text-green f-20"><?php /* echo $total_mensalidades->total; */ ?>&mdash;</h6>
+                                <h6 class="mb-0 text-green f-20"><?php echo $veiculos_qtd->total_moto; ?></h6>
                             </div>
                         </div>
                         <div class="row align-items-center text-center">
                             <div class="col">
-                                <h6 class="mb-0">Pagas <span class="badge badge-pill bg-success text-white"><?php /* echo $total_mensalidades_receber; */ ?></span></h6>
+                                <h6 class="mb-0">-- <span class="badge badge-pill bg-success text-white"><?php /* echo $total_mensalidades_receber; */ ?></span></h6>
                             </div>
                             <div class="col"><i class="fas fa-motorcycle fa-2x text-gray-300"></i></div>
                             <div class="col">
-                                <h6 class="mb-0">Abertas <span class="badge badge-pill bg-success text-white"><?php /* echo $total_mensalidades_pagas; */ ?></span></h6>
+                                <h6 class="mb-0">-- <span class="badge badge-pill bg-success text-white"><?php /* echo $total_mensalidades_pagas; */ ?></span></h6>
                             </div>
                         </div>
                         <h6 class="pt-badge bg-green small">STEPark</h6>
@@ -176,16 +176,28 @@
                                     <h5>CARROS</h5>
                                 </div>
                                 <div class="contador-row">
-                                    <div class="bt00e"><p class="mostEsq">ENTRADA:</p></div>
-                                    <div class="bt00d"><p id="ecar" class="mostDir">--</p></div>
+                                    <div class="bt00e">
+                                        <p class="mostEsq">ENTRADA:</p>
+                                    </div>
+                                    <div class="bt00d">
+                                        <p id="ecar" class="mostDir"><?php echo $veiculos_qtd->total_carro_entrada; ?></p>
+                                    </div>
                                 </div>
                                 <div class="contador-row">
-                                    <div class="bt00e"><p class="mostEsq">SAÍDA:</p></div>
-                                    <div class="bt00d"><p id="scar" class="mostDir">--</p></div>
+                                    <div class="bt00e">
+                                        <p class="mostEsq">SAÍDA:</p>
+                                    </div>
+                                    <div class="bt00d">
+                                        <p id="scar" class="mostDir"><?php echo $veiculos_qtd->total_carro_saida; ?></p>
+                                    </div>
                                 </div>
                                 <div class="contador-row">
-                                    <div class="bt00e"><p class="mostEsq">PÁTIO:</p></div>
-                                    <div class="bt00d"><p id="pcar" class="mostDir">--</p></div>
+                                    <div class="bt00e">
+                                        <p class="mostEsq">PÁTIO:</p>
+                                    </div>
+                                    <div class="bt00d">
+                                        <p id="pcar" class="mostDir"><?php echo (int)$veiculos_qtd->total_carro_entrada - (int)$veiculos_qtd->total_carro_saida; ?></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -198,16 +210,28 @@
                                     <h5>MOTOS</h5>
                                 </div>
                                 <div class="contador-row">
-                                    <div class="bt00e"><p class="mostEsq">ENTRADA:</p></div>
-                                    <div class="bt00d"><p id="emot" class="mostDir">--</p></div>
+                                    <div class="bt00e">
+                                        <p class="mostEsq">ENTRADA:</p>
+                                    </div>
+                                    <div class="bt00d">
+                                        <p id="emot" class="mostDir"><?php echo $veiculos_qtd->total_moto_entrada; ?></p>
+                                    </div>
                                 </div>
                                 <div class="contador-row">
-                                    <div class="bt00e"><p class="mostEsq">SAÍDA:</p></div>
-                                    <div class="bt00d"><p id="smot" class="mostDir">--</p></div>
+                                    <div class="bt00e">
+                                        <p class="mostEsq">SAÍDA:</p>
+                                    </div>
+                                    <div class="bt00d">
+                                        <p id="smot" class="mostDir"><?php echo $veiculos_qtd->total_moto_saida; ?></p>
+                                    </div>
                                 </div>
                                 <div class="contador-row">
-                                    <div class="bt00e"><p class="mostEsq">PÁTIO:</p></div>
-                                    <div class="bt00d"><p id="pmot" class="mostDir">--</p></div>
+                                    <div class="bt00e">
+                                        <p class="mostEsq">PÁTIO:</p>
+                                    </div>
+                                    <div class="bt00d">
+                                        <p id="pmot" class="mostDir"><?php echo (int)$veiculos_qtd->total_moto_entrada - (int)$veiculos_qtd->total_moto_saida; ?></p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -223,7 +247,7 @@
                         <h5 class="text-uppercase h6">Futuro</h5>
                     </div>
                     <div class="card-body">
-                       
+
                     </div>
                 </div>
             </div>

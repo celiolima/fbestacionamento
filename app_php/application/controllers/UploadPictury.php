@@ -17,6 +17,7 @@ class UploadPictury extends CI_Controller
             return;
         }
 
+        $this->load->model('core_model');
         date_default_timezone_set('America/Sao_Paulo');
     }
 
@@ -42,9 +43,13 @@ class UploadPictury extends CI_Controller
             }
         }
 
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['foto'])) {
             $arquivo = $_FILES['foto'];
+            $headers        = getallheaders();
+            $authorization  = $headers['Authorization'] ?? null;
+            $type  = $headers['type'] ?? null;
+            $cam  = $headers['cam'] ?? null;
+            $insetDb = false;
 
             // [ADICIONADO] Verifica tamanho máximo do arquivo
             if ($arquivo['size'] > self::MAX_FILE_SIZE) {
@@ -59,8 +64,10 @@ class UploadPictury extends CI_Controller
 
                 if ($tipoMime === 'image/jpeg') {
 
-                    $dataHora = date('Y-m-d_H-i-s');
-                    $novoNome = $dataHora . '_' . bin2hex(random_bytes(8)) . '.jpg';
+                    //$dataHora = date('Y-m-d_H-i-s');
+                    //$novoNome = $dataHora . '_' . bin2hex(random_bytes(8)) . '.jpg';
+                    $dataHora = date('d-m-Y_H:i:s');
+                    $novoNome = $type . ' ' . $cam . ' ' . $dataHora . '.jpg';
 
                     // [CORRIGIDO] Caminho físico completo para salvar o arquivo
                     $caminhoFinal = $diretorioDestino . $novoNome;
@@ -95,8 +102,9 @@ class UploadPictury extends CI_Controller
                     );
 
                     if (imagejpeg($imgRedimensionada, $caminhoFinal, 90)) {
-                        $sucesso = true;
-                        $mensagem = 'Sucesso! Foto salva e redimensionada: ' . $novoNome;
+                        $insetDb = true;
+                        /*  $sucesso = true;
+                        $mensagem = 'Sucesso! Foto salva e redimensionada: ' . $novoNome; */
                     } else {
                         $mensagem = 'Erro ao salvar a imagem no servidor.';
                     }
@@ -109,9 +117,32 @@ class UploadPictury extends CI_Controller
             } else {
                 $mensagem = 'Erro no upload do arquivo (código: ' . $arquivo['error'] . ').';
             }
+            if ($insetDb) {
+                $insertDb = false;
+                $this->load->model('core_model');
+                // [ADICIONADO] Salva informações no banco de dados
+                $data = array(
+                    'name'     => $novoNome,
+                    'dirImage ' => 'public/uploads/' . $novoNome,
+                    'type'     => $type
+                );
+
+                $insert = $this->core_model->insert('imagem_carro', $data, true);
+                if (!$insert) {
+                    $this->_responder($sucesso, $mensagem);
+                    $sucesso = false;
+                    $mensagem = 'Erro: Não foi possível salvar as informações no banco de dados.';
+                    $this->_responder($sucesso, $mensagem);
+                    return;
+                }
+                $sucesso = true;
+                $mensagem = 'Sucesso! Foto salva, redimensionada e registrada no banco: ' . $novoNome;
+                $this->_responder($sucesso, $mensagem);
+                return;
+            }
         } else {
             // [ADICIONADO] Exibe formulário simples se não for POST
-
+            $sucesso = false;
             $mensagem = 'Erro: nao foi possivel fazer o upload';
             $this->_responder($sucesso, $mensagem);
 
@@ -141,16 +172,45 @@ class UploadPictury extends CI_Controller
      */
     private function _exibir_formulario()
     {
-        echo '<!DOCTYPE html>
-                <html lang="pt-BR">
-                <head><meta charset="UTF-8"><title>Upload de Foto</title></head>
-                <body>
+        echo '
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <title>Upload de Foto</title>
+            </head>
+            <body>
                 <h2>Upload de Foto (apenas JPEG, máx 5 MB)</h2>
-                <form method="POST" enctype="multipart/form-data">
+                <form id="formFoto" enctype="multipart/form-data">
                     <input type="file" name="foto" accept="image/jpeg" required>
                     <button type="submit">Enviar</button>
                 </form>
-                </body>
-                </html>';
+
+                <script>
+                    document.getElementById("formFoto").addEventListener("submit", function(e) {
+                        e.preventDefault();
+
+                        const formData = new FormData(this);
+
+                        fetch("http://localhost:8080/uploadPictury", {
+                            method: "POST",
+                            headers: {
+                                "Authorization": "Bearer token123",
+                                "type": "entrada",
+                                "cam": "cam1"
+                            },
+                            body: formData
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Resposta:", data);
+                        })
+                        .catch(error => {
+                            console.error("Erro:", error);
+                        });
+                    });
+                </script>
+            </body>
+            </html>';
     }
 }

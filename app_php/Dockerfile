@@ -39,7 +39,8 @@ WORKDIR /var/www/html
 
 
 # Copiar raiz
-COPY . /var/www/html
+#COPY . /var/www/html # desenvolvimento
+COPY . /var/www/html  
 
 # Configurar permissões
 RUN chown -R www-data:www-data /var/www/html \

@@ -1,10 +1,22 @@
 <?php
 
-defined('BASEPATH') OR exit('Ação não permitida');
+defined('BASEPATH') or exit('Ação não permitida');
 
-class Core_model extends CI_Model{
+class Core_model extends CI_Model
+{
 
-    public function get_all($table = NULL, $condition = NULL) {
+    public function get_ultimo_registro($table = NULL)
+    {
+        $query = $this->db
+            ->order_by('id', 'DESC')
+            ->limit(1)
+            ->get($table);
+
+        return $query->row();
+    }
+
+    public function get_all($table = NULL, $condition = NULL)
+    {
 
         if ($table) {
 
@@ -18,7 +30,8 @@ class Core_model extends CI_Model{
         }
     }
 
-    public function get_by_id($table = NULL, $condition = NULL) {
+    public function get_by_id($table = NULL, $condition = NULL)
+    {
 
 
         if ($table && is_array($condition)) {
@@ -32,7 +45,8 @@ class Core_model extends CI_Model{
         }
     }
 
-    public function insert($table = NULL, $data = NULL, $get_last_id = NULL) {
+    public function insert($table = NULL, $data = NULL, $get_last_id = NULL)
+    {
 
         if ($table && is_array($data)) {
 
@@ -55,7 +69,8 @@ class Core_model extends CI_Model{
         }
     }
 
-    public function update($table = NULL, $data = NULL, $condition = NULL) {
+    public function update($table = NULL, $data = NULL, $condition = NULL)
+    {
 
         if ($table && is_array($data) && is_array($condition)) {
 
@@ -70,7 +85,8 @@ class Core_model extends CI_Model{
         }
     }
 
-    public function delete($table = NULL, $condition = NULL) {
+    public function delete($table = NULL, $condition = NULL)
+    {
 
         $this->db->db_debug = FALSE;
 
@@ -97,5 +113,4 @@ class Core_model extends CI_Model{
             return false;
         }
     }
-
 }
