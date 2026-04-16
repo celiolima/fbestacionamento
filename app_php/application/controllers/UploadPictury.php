@@ -146,7 +146,7 @@ class UploadPictury extends CI_Controller
             $mensagem = 'Erro: nao foi possivel fazer o upload';
             $this->_responder($sucesso, $mensagem);
 
-            $this->_exibir_formulario(); // Para testes manuais via navegador
+            //$this->_exibir_formulario(); // Para testes manuais via navegador
             return;
         }
 
