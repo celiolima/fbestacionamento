@@ -146,7 +146,7 @@ class UploadPictury extends CI_Controller
             $mensagem = 'Erro: nao foi possivel fazer o upload';
             $this->_responder($sucesso, $mensagem);
 
-            //$this->_exibir_formulario(); // Para testes manuais via navegador
+            $this->_exibir_formulario(); // Para testes manuais via navegador
             return;
         }
 
@@ -191,8 +191,8 @@ class UploadPictury extends CI_Controller
                         e.preventDefault();
 
                         const formData = new FormData(this);
-
-                        fetch("http://localhost:8080/uploadPictury", {
+                        fetch("https://fbjuaz.stesistemas.com/uploadPictury", {
+                        //fetch("http://localhost:8080/uploadPictury", {
                             method: "POST",
                             headers: {
                                 "Authorization": "Bearer token123",
