@@ -49,8 +49,7 @@ services:
       dockerfile: Dockerfile
     container_name: php-app
     depends_on:
-      - mysql
-      - wsnode
+      - mysql      
     restart: always
     ports:
       - "8080:80"
