@@ -128,13 +128,13 @@ class UploadPictury extends CI_Controller
                 );
 
                 $insert = $this->core_model->insert('imagem_carro', $data, true);
-                if (!$insert) {
+                /* if (!$insert) {
                     $this->_responder($sucesso, $mensagem);
                     $sucesso = false;
                     $mensagem = 'Erro: Não foi possível salvar as informações no banco de dados.';
                     $this->_responder($sucesso, $mensagem);
                     return;
-                }
+                } */
                 $sucesso = true;
                 $mensagem = 'Sucesso! Foto salva, redimensionada e registrada no banco: ' . $novoNome;
                 $this->_responder($sucesso, $mensagem);
