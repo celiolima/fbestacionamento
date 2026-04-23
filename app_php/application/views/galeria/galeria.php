@@ -173,7 +173,7 @@ if ($arquivos)
                                                 $nome = basename($foto->name); ?>
                                                 <div class="card">
                                                     <input type="checkbox" name="fotos_para_excluir[]" value="<?php echo $foto->id; ?>" class="foto-check checkbox-container">
-                                                    <img src="<?php echo $foto->dirImage; ?>" alt="Foto" onclick="abrirLightbox('<?php echo $foto->dirImage; ?>')">
+                                                    <img src="<?php echo base_url($foto->dirImage); ?>" alt="Foto" onclick="abrirLightbox('<?php echo $foto->dirImage; ?>')">
                                                     <input id="<?php echo $foto->id; ?>" class="span12" type="hidden" name="<?php echo $foto->id; ?>" value="<?php echo $foto->id; ?>" />
                                                     <div class="card-body">
                                                         <p class="card-text"><?php echo $nome; ?></p>
