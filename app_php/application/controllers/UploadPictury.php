@@ -130,6 +130,10 @@ class UploadPictury extends CI_Controller
                     //'type'     => $type
                     'type'     => 'entrada'
                 );
+                $sucesso = false;
+                $mensagem = 'Erro: ' . $data['name'] . ' e' . $data['type'] . 'e' . $data['dirImage'];
+                $this->_responder($sucesso, $mensagem);
+                return;
 
                 $this->core_model->insert('imagem_carro', $data, true);
                 /* if (!$insert) {
