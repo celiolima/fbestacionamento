@@ -6,6 +6,10 @@ class UploadPictury extends CI_Controller
 {
     // Tamanho máximo permitido para upload: 5 MB
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    
+    // Constantes para processamento de imagem
+    const IMG_HEIGHT = 400;
+    const IMG_QUALITY = 90;
 
     public function __construct()
     {
@@ -16,8 +20,8 @@ class UploadPictury extends CI_Controller
 
         // [CORRIGIDO] Autenticação reabilitada — rota estava pública
         if (!$this->ion_auth->logged_in()) {
-            $this->_responder(true, 'Erro: nao foi possivel fazer o upload');
-            return;
+            $this->_responder(false, 'Erro: não foi possível fazer o upload. Usuário não autenticado.');
+            exit(); // ✅ CRÍTICO: Impede execução do index()
         }
 
         $this->load->model('core_model');
@@ -48,11 +52,14 @@ class UploadPictury extends CI_Controller
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['foto'])) {
             $arquivo = $_FILES['foto'];
-            $headers        = getallheaders();
-            $authorization  = $headers['Authorization'] ?? null;
-            $type  = $headers['type'] ?? null;
-            $cam  = $headers['cam'] ?? null;
-            $insetDb = false;
+            $headers = getallheaders();
+            $authorization = $headers['Authorization'] ?? null;
+            
+            // ✅ SEGURANÇA: Sanitiza inputs vindos de headers para prevenir path traversal
+            $type = preg_replace('/[^a-zA-Z0-9_-]/', '', $headers['type'] ?? 'unknown');
+            $cam = preg_replace('/[^a-zA-Z0-9_-]/', '', $headers['cam'] ?? 'cam1');
+            
+            $insertDb = false; // ✅ Corrigido typo: insetDb → insertDb
 
             // [ADICIONADO] Verifica tamanho máximo do arquivo
             if ($arquivo['size'] > self::MAX_FILE_SIZE) {
@@ -66,11 +73,9 @@ class UploadPictury extends CI_Controller
                 $tipoMime = $finfo->file($arquivo['tmp_name']);
 
                 if ($tipoMime === 'image/jpeg') {
-
-                    //$dataHora = date('Y-m-d_H-i-s');
-                    //$novoNome = $dataHora . '_' . bin2hex(random_bytes(8)) . '.jpg';
-                    $dataHora = date('d-m-Y_H:i:s');
-                    $novoNome = $type . ' ' . $cam . ' ' . $dataHora . '.jpg';
+                    // ✅ Corrigido: ':' não é permitido em nomes de arquivo no Windows
+                    $dataHora = date('d-m-Y_H-i-s');
+                    $novoNome = $type . '_' . $cam . '_' . $dataHora . '.jpg';
 
                     // [CORRIGIDO] Caminho físico completo para salvar o arquivo
                     $caminhoFinal = $diretorioDestino . $novoNome;
@@ -86,7 +91,8 @@ class UploadPictury extends CI_Controller
                     $larguraOriginal = imagesx($imgOriginal);
                     $alturaOriginal = imagesy($imgOriginal);
 
-                    $novaAltura = 400;
+                    // ✅ Usa constantes ao invés de magic numbers
+                    $novaAltura = self::IMG_HEIGHT;
                     $novaLargura = (int) floor($larguraOriginal * ($novaAltura / $alturaOriginal));
 
                     $imgRedimensionada = imagecreatetruecolor($novaLargura, $novaAltura);
@@ -104,10 +110,9 @@ class UploadPictury extends CI_Controller
                         $alturaOriginal
                     );
 
-                    if (imagejpeg($imgRedimensionada, $caminhoFinal, 90)) {
-                        $insetDb = true;
-                        /*  $sucesso = true;
-                        $mensagem = 'Sucesso! Foto salva e redimensionada: ' . $novoNome; */
+                    // ✅ Usa constante de qualidade
+                    if (imagejpeg($imgRedimensionada, $caminhoFinal, self::IMG_QUALITY)) {
+                        $insertDb = true;
                     } else {
                         $mensagem = 'Erro ao salvar a imagem no servidor.';
                     }
@@ -120,36 +125,34 @@ class UploadPictury extends CI_Controller
             } else {
                 $mensagem = 'Erro no upload do arquivo (código: ' . $arquivo['error'] . ').';
             }
-            if ($insetDb) {
-                $insertDb = false;
-                $this->load->model('core_model');
-                // [ADICIONADO] Salva informações no banco de dados
+            
+            // ✅ Corrigido typo e reativada validação de insert
+            if ($insertDb) {
+                // ✅ Removido carregamento redundante do model (já está no construtor)
                 $data = array(
-                    'name'     => $novoNome,
-                    'dirImage ' => 'uploads/' . $novoNome,
-                    //'type'     => $type
-                    'type'     => 'entrada'
+                    'name' => $novoNome,
+                    'dirImage' => 'uploads/' . $novoNome, // ✅ Removido espaço após 'dirImage'
+                    'type' => $type // ✅ Usa o $type sanitizado do header
                 );
 
-                $this->core_model->insert('imagem_carro', $data, true);
-                /* if (!$insert) {
-                    $this->_responder($sucesso, $mensagem);
+                $insert = $this->core_model->insert('imagem_carro', $data, true);
+                
+                // ✅ CRÍTICO: Reativada validação de insert
+                if (!$insert) {
+                    log_message('error', 'Falha ao inserir imagem no banco: ' . $novoNome);
                     $sucesso = false;
                     $mensagem = 'Erro: Não foi possível salvar as informações no banco de dados.';
                     $this->_responder($sucesso, $mensagem);
                     return;
-                } */
+                }
+                
                 $sucesso = true;
                 $mensagem = 'Sucesso! Foto salva, redimensionada e registrada no banco: ' . $novoNome;
                 $this->_responder($sucesso, $mensagem);
                 return;
             }
         } else {
-            // [ADICIONADO] Exibe formulário simples se não for POST
-            $sucesso = false;
-            $mensagem = 'Erro: nao foi possivel fazer o upload';
-            $this->_responder($sucesso, $mensagem);
-
+            // Exibe formulário simples se não for POST
             $this->_exibir_formulario(); // Para testes manuais via navegador
             return;
         }
@@ -176,13 +179,20 @@ class UploadPictury extends CI_Controller
      */
     private function _adicionar_cors_headers()
     {
-        // Permite requisições de qualquer origem (em produção, especifique as origens)
-        //header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Origin: http://localhost:8080');
-        header('Access-Control-Allow-Origin: https://fbjuaz.stesistemas.com');
+        // ✅ CRÍTICO: Corrigido headers CORS duplicados - valida origin dinamicamente
+        $allowed_origins = [
+            'http://localhost:8080',
+            'https://fbjuaz.stesistemas.com'
+        ];
+        
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+        
+        if (in_array($origin, $allowed_origins)) {
+            header('Access-Control-Allow-Origin: ' . $origin);
+        }
 
         // Métodos HTTP permitidos
-        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+        header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 
         // Headers permitidos
         header('Access-Control-Allow-Headers: Content-Type, Authorization, type, cam');
@@ -224,8 +234,12 @@ class UploadPictury extends CI_Controller
                         e.preventDefault();
 
                         const formData = new FormData(this);
-                        fetch("https://fbjuaz.stesistemas.com/uploadPictury", {
-                        //fetch("http://localhost:8080/uploadPictury", {                       
+                        
+                        // ✅ Detecção automática de ambiente
+                        const isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+                        const url = isLocalhost ? "/uploadPictury" : window.location.origin + "/uploadPictury";
+                        
+                        fetch(url, {
                             method: "POST",
                             headers: {
                                 "Authorization": "Bearer token123",
@@ -237,9 +251,11 @@ class UploadPictury extends CI_Controller
                         .then(response => response.json())
                         .then(data => {
                             console.log("Resposta:", data);
+                            alert(data.sucesso ? "✅ " + data.mensagem : "❌ " + data.mensagem);
                         })
                         .catch(error => {
                             console.error("Erro:", error);
+                            alert("❌ Erro: " + error);
                         });
                     });
                 </script>
