@@ -55,9 +55,10 @@ services:
       - "8080:80"
     volumes:
       # DESENVOLVIMENTO: mapeia código local diretamente
-      - ./app_php:/var/www/html:cached  # cached para melhor performance
+      #- ./app_php:/var/www/html:cached  # cached para melhor performance
       # produção: volume separado para uploads se necessário
-      #- volume_wsjbjuaz_fotos:/var/www/html/public/uploads:delegated
+      #- volume_wsjbjuaz_fotos:/var/www/html/uploads:delegated
+      - volume_jbjuaz:/var/www/html:cached  # cached para melhor performance
     networks:
       - jbjuaz
     environment:
@@ -89,7 +90,7 @@ volumes:
   # Apenas volumes necessários que não são de desenvolvimento
   volume_db_data_jbjuaz:
     external: true
-  volume_wsjbjuaz_fotos:
+  volume_jbjuaz:
     external: true
 
    

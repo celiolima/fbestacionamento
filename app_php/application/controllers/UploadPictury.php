@@ -223,13 +223,8 @@ class UploadPictury extends CI_Controller
                         e.preventDefault();
 
                         const formData = new FormData(this);
-                        
-                        // Detectar se está em desenvolvimento ou produção
-                        const url = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-                            ? '/uploadPictury'  // Desenvolvimento: usa URL relativa (mesma origem)
-                            : window.location.origin + '/uploadPictury';  // Produção: URL completa
-                        
-                        fetch(url, {                       
+                        fetch("https://fbjuaz.stesistemas.com/uploadPictury", {
+                        //fetch("http://localhost:8080/uploadPictury", {                       
                             method: "POST",
                             headers: {
                                 "Authorization": "Bearer token123",
@@ -241,15 +236,9 @@ class UploadPictury extends CI_Controller
                         .then(response => response.json())
                         .then(data => {
                             console.log("Resposta:", data);
-                            if (data.sucesso) {
-                                alert("✅ " + data.mensagem);
-                            } else {
-                                alert("❌ " + data.mensagem);
-                            }
                         })
                         .catch(error => {
                             console.error("Erro:", error);
-                            alert("❌ Erro: " + error);
                         });
                     });
                 </script>
