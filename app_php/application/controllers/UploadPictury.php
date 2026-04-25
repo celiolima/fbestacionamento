@@ -6,7 +6,7 @@ class UploadPictury extends CI_Controller
 {
     // Tamanho máximo permitido para upload: 5 MB
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
-    
+
     // Constantes para processamento de imagem
     const IMG_HEIGHT = 400;
     const IMG_QUALITY = 90;
@@ -54,11 +54,11 @@ class UploadPictury extends CI_Controller
             $arquivo = $_FILES['foto'];
             $headers = getallheaders();
             $authorization = $headers['Authorization'] ?? null;
-            
+
             // ✅ SEGURANÇA: Sanitiza inputs vindos de headers para prevenir path traversal
             $type = preg_replace('/[^a-zA-Z0-9_-]/', '', $headers['type'] ?? 'unknown');
             $cam = preg_replace('/[^a-zA-Z0-9_-]/', '', $headers['cam'] ?? 'cam1');
-            
+
             $insertDb = false; // ✅ Corrigido typo: insetDb → insertDb
 
             // [ADICIONADO] Verifica tamanho máximo do arquivo
@@ -125,7 +125,7 @@ class UploadPictury extends CI_Controller
             } else {
                 $mensagem = 'Erro no upload do arquivo (código: ' . $arquivo['error'] . ').';
             }
-            
+
             // ✅ Corrigido typo e reativada validação de insert
             if ($insertDb) {
                 // ✅ Removido carregamento redundante do model (já está no construtor)
@@ -135,19 +135,20 @@ class UploadPictury extends CI_Controller
                     'type' => $type // ✅ Usa o $type sanitizado do header
                 );
 
-                $insert = $this->core_model->insert('imagem_carro', $data, true);
-                
-                // ✅ CRÍTICO: Reativada validação de insert
-                if (!$insert) {
-                    log_message('error', 'Falha ao inserir imagem no banco: ' . $novoNome);
+                // Executa insert
+                $this->core_model->insert('imagem_carro', $data, true);
+
+                // ✅ CRÍTICO: Verifica se insert funcionou através do affected_rows
+                // O método insert() do Core_model não retorna valor, apenas define flashdata
+                if ($this->db->affected_rows() > 0) {
+                    $sucesso = true;
+                    $mensagem = 'Sucesso! Foto salva, redimensionada e registrada no banco: ' . $novoNome;
+                } else {
+                    log_message('error', 'Falha ao inserir imagem no banco: ' . $novoNome . ' | Erro DB: ' . $this->db->error()['message']);
                     $sucesso = false;
                     $mensagem = 'Erro: Não foi possível salvar as informações no banco de dados.';
-                    $this->_responder($sucesso, $mensagem);
-                    return;
                 }
-                
-                $sucesso = true;
-                $mensagem = 'Sucesso! Foto salva, redimensionada e registrada no banco: ' . $novoNome;
+
                 $this->_responder($sucesso, $mensagem);
                 return;
             }
@@ -184,9 +185,9 @@ class UploadPictury extends CI_Controller
             'http://localhost:8080',
             'https://fbjuaz.stesistemas.com'
         ];
-        
+
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-        
+
         if (in_array($origin, $allowed_origins)) {
             header('Access-Control-Allow-Origin: ' . $origin);
         }
