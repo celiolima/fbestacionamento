@@ -127,7 +127,8 @@ class UploadPictury extends CI_Controller
                 $data = array(
                     'name'     => $novoNome,
                     'dirImage ' => 'uploads/' . $novoNome,
-                    'type'     => $type
+                    //'type'     => $type
+                    'type'     => 'entrada'
                 );
 
                 $this->core_model->insert('imagem_carro', $data, true);
