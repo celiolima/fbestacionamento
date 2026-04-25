@@ -11,6 +11,9 @@ class UploadPictury extends CI_Controller
     {
         parent::__construct();
 
+        // 🔧 CORREÇÃO CORS: Adicionar headers de CORS NO CONSTRUTOR (antes de qualquer verificação)
+        $this->_adicionar_cors_headers();
+
         // [CORRIGIDO] Autenticação reabilitada — rota estava pública
         if (!$this->ion_auth->logged_in()) {
             $this->_responder(true, 'Erro: nao foi possivel fazer o upload');
@@ -23,9 +26,6 @@ class UploadPictury extends CI_Controller
 
     public function index()
     {
-        // 🔧 CORREÇÃO CORS: Adicionar headers de CORS
-        $this->_adicionar_cors_headers();
-        
         // [CORRIGIDO] Caminho físico no servidor em vez de base_url() HTTP
         $diretorioDestino = FCPATH . 'uploads' . DIRECTORY_SEPARATOR;
         $mensagem = '';
@@ -176,20 +176,22 @@ class UploadPictury extends CI_Controller
     private function _adicionar_cors_headers()
     {
         // Permite requisições de qualquer origem (em produção, especifique as origens)
-        header('Access-Control-Allow-Origin: *');
-        
+        //header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Origin: http://localhost:8080');
+        header('Access-Control-Allow-Origin: https://fbjuaz.stesistemas.com');
+
         // Métodos HTTP permitidos
         header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-        
+
         // Headers permitidos
         header('Access-Control-Allow-Headers: Content-Type, Authorization, type, cam');
-        
+
         // Permite credenciais
         header('Access-Control-Allow-Credentials: true');
-        
+
         // Tempo máximo de cache para preflight (24 horas)
         header('Access-Control-Max-Age: 86400');
-        
+
         // Tratamento para requisições OPTIONS (preflight)
         if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
             http_response_code(200);
@@ -221,7 +223,13 @@ class UploadPictury extends CI_Controller
                         e.preventDefault();
 
                         const formData = new FormData(this);
-                        fetch("https://fbjuaz.stesistemas.com/uploadPictury", {                       
+                        
+                        // Detectar se está em desenvolvimento ou produção
+                        const url = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+                            ? '/uploadPictury'  // Desenvolvimento: usa URL relativa (mesma origem)
+                            : window.location.origin + '/uploadPictury';  // Produção: URL completa
+                        
+                        fetch(url, {                       
                             method: "POST",
                             headers: {
                                 "Authorization": "Bearer token123",
@@ -233,9 +241,15 @@ class UploadPictury extends CI_Controller
                         .then(response => response.json())
                         .then(data => {
                             console.log("Resposta:", data);
+                            if (data.sucesso) {
+                                alert("✅ " + data.mensagem);
+                            } else {
+                                alert("❌ " + data.mensagem);
+                            }
                         })
                         .catch(error => {
                             console.error("Erro:", error);
+                            alert("❌ Erro: " + error);
                         });
                     });
                 </script>

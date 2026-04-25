@@ -42,12 +42,12 @@ services:
       - jbjuaz
 
 
-  php-app:
+  phpapp:
     #image: php:7.4-apache
     build:      
       context: ./app_php
       dockerfile: Dockerfile
-    container_name: php-app
+    container_name: phpapp
     depends_on:
       - mysql      
     restart: always
@@ -55,9 +55,9 @@ services:
       - "8080:80"
     volumes:
       # DESENVOLVIMENTO: mapeia código local diretamente
-      # - ./app_php:/var/www/html:cached  # cached para melhor performance
+      - ./app_php:/var/www/html:cached  # cached para melhor performance
       # produção: volume separado para uploads se necessário
-      - volume_wsjbjuaz_fotos:/var/www/html/public/uploads:delegated
+      #- volume_wsjbjuaz_fotos:/var/www/html/public/uploads:delegated
     networks:
       - jbjuaz
     environment:
