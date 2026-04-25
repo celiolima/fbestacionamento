@@ -1,5 +1,5 @@
 <?php
-$diretorio = 'public/uploads/';
+$diretorio =  'public/uploads/';
 $mensagem = "";
 
 // Lógica de Exclusão Múltipla
@@ -12,11 +12,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['excluir_selecionados']
         $diretorioReal = realpath($diretorio);
         foreach ($_POST['fotos_para_excluir'] as $idFoto) {
             $Foto = $this->core_model->get_by_id('imagem_carro', array('id' => $idFoto));  // Busca a foto no banco de dados         
-            $this->core_model->delete('imagem_carro', array('id' => $idFoto)); // Exclui a foto do banco de dados
+            //$this->core_model->delete('imagem_carro', array('id' => $idFoto)); // Exclui a foto do banco de dados
+
+
 
             $nomeFoto = $Foto->name;
-            $caminhoCompleto = realpath($diretorio . basename($nomeFoto));
+            $caminhoCompleto = base_url() . $diretorio . basename($Foto->name);
+
+            echo "<pre>";
+            print_r($diretorioReal);
+            echo "</pre>";
+            exit;
+
+
             if ($caminhoCompleto && strpos($caminhoCompleto, $diretorioReal) === 0 && file_exists($caminhoCompleto)) {
+                echo "<pre>";
+                print_r($caminhoCompleto);
+                echo "</pre>";
+                exit;
+
                 unlink($caminhoCompleto);
                 $contagem++;
             }

@@ -23,8 +23,11 @@ class UploadPictury extends CI_Controller
 
     public function index()
     {
+        // 🔧 CORREÇÃO CORS: Adicionar headers de CORS
+        $this->_adicionar_cors_headers();
+        
         // [CORRIGIDO] Caminho físico no servidor em vez de base_url() HTTP
-        $diretorioDestino = FCPATH . 'public/uploads' . DIRECTORY_SEPARATOR;
+        $diretorioDestino = FCPATH . 'uploads' . DIRECTORY_SEPARATOR;
         $mensagem = '';
         $sucesso = false;
 
@@ -123,11 +126,11 @@ class UploadPictury extends CI_Controller
                 // [ADICIONADO] Salva informações no banco de dados
                 $data = array(
                     'name'     => $novoNome,
-                    'dirImage ' => 'public/uploads/' . $novoNome,
+                    'dirImage ' => 'uploads/' . $novoNome,
                     'type'     => $type
                 );
 
-                $insert = $this->core_model->insert('imagem_carro', $data, true);
+                $this->core_model->insert('imagem_carro', $data, true);
                 /* if (!$insert) {
                     $this->_responder($sucesso, $mensagem);
                     $sucesso = false;
@@ -165,6 +168,33 @@ class UploadPictury extends CI_Controller
                 'sucesso' => $sucesso,
                 'mensagem' => $mensagem
             ]));
+    }
+
+    /**
+     * Adiciona headers CORS para permitir requisições de diferentes origens
+     */
+    private function _adicionar_cors_headers()
+    {
+        // Permite requisições de qualquer origem (em produção, especifique as origens)
+        header('Access-Control-Allow-Origin: *');
+        
+        // Métodos HTTP permitidos
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+        
+        // Headers permitidos
+        header('Access-Control-Allow-Headers: Content-Type, Authorization, type, cam');
+        
+        // Permite credenciais
+        header('Access-Control-Allow-Credentials: true');
+        
+        // Tempo máximo de cache para preflight (24 horas)
+        header('Access-Control-Max-Age: 86400');
+        
+        // Tratamento para requisições OPTIONS (preflight)
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            http_response_code(200);
+            exit();
+        }
     }
 
     /**
