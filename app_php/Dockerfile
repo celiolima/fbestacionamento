@@ -31,8 +31,8 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
 RUN usermod -u 1000 www-data
 
 
-# Habilitar mod_rewrite do Apache
-RUN a2enmod rewrite
+# Habilitar mod_rewrite e mod_headers do Apache
+RUN a2enmod rewrite headers
 
 # Definir diretório de trabalho
 WORKDIR /var/www/html

@@ -1,9 +1,26 @@
+# ========================================
+# CORS Headers para Fontes Web
+# ========================================
+<IfModule mod_headers.c>
+    # Permite carregamento de fontes de qualquer origem
+    <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|font.css|css|js)$">
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Methods "GET, OPTIONS"
+        Header set Access-Control-Allow-Headers "Content-Type"
+    </FilesMatch>
+</IfModule>
+
+# ========================================
+# Rewrite Rules do CodeIgniter
+# ========================================
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php/$1 [L]
 
-# Configurações de segurança
+# ========================================
+# Configurações de Segurança
+# ========================================
 <FilesMatch "\.(php|inc)$">
     php_flag display_errors off
 </FilesMatch>
