@@ -164,33 +164,6 @@ if ($arquivos)
                                         </div>
                                     </form>
 
-                                    <!-- <form method="POST">
-                                    <div class="controles">
-                                        <label><input type="checkbox" onclick="toggleTodos(this)"> Selecionar Todos</label>
-                                        <button type="submit" name="excluir_selecionados" class="btn-excluir" onclick="return confirm('Excluir selecionados?')">Excluir</button>
-                                    </div>
-
-                                    <div class="galeria">
-                                        <?php if ($imagem_carro):
-                                            foreach ($imagem_carro as $foto):
-                                                $nome = basename($foto->name); ?>
-                                                <div class="card">
-                                                    <input type="checkbox" name="fotos_para_excluir[]" value="<?php echo $foto->id; ?>" class="foto-check checkbox-container">
-                                                    <img src="<?php echo base_url($foto->dirImage); ?>" alt="Foto" onclick="abrirLightbox('<?php echo $foto->dirImage; ?>')">
-                                                    <input id="<?php echo $foto->id; ?>" class="span12" type="hidden" name="<?php echo $foto->id; ?>" value="<?php echo $foto->id; ?>" />
-                                                    <div class="card-body">
-                                                        <p class="card-text"><?php echo $nome; ?></p>
-                                                    </div>
-                                                </div>
-                                            <?php
-                                            endforeach;
-                                        else: ?>
-                                            <p>Nenhuma imagem encontrada.</p>
-                                        <?php
-                                        endif; ?>
-                                    </div>
-                                </form> -->
-
                                     <p style="text-align:center;"><a href="<?php echo base_url('uploadPictury'); ?>">Fazer novo Upload</a></p>
                                 </div>
 
