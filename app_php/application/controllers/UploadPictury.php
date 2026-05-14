@@ -18,10 +18,23 @@ class UploadPictury extends CI_Controller
         // 🔧 CORREÇÃO CORS: Adicionar headers de CORS NO CONSTRUTOR (antes de qualquer verificação)
         $this->_adicionar_cors_headers();
 
-        // [CORRIGIDO] Autenticação reabilitada — rota estava pública
+        // [CORRIGIDO] Autenticação: aceita sessão web (browser) OU Basic Auth (ESP32-CAM)
         if (!$this->ion_auth->logged_in()) {
-            $this->_responder(false, 'Erro: não foi possível fazer o upload. Usuário não autenticado.');
-            exit(); // ✅ CRÍTICO: Impede execução do index()
+            // Fallback: Basic Auth para clientes API (dispositivos embarcados sem sessão)
+            $headers = getallheaders();
+            $authorization = $headers['Authorization'] ?? '';
+            if (strpos($authorization, 'Basic ') === 0) {
+                $decoded = base64_decode(substr($authorization, 6));
+                $parts   = explode(':', $decoded, 2);
+                if (count($parts) !== 2 || !$this->ion_auth->login($parts[0], $parts[1], false)) {
+                    $this->_responder(false, 'Erro: credenciais Basic Auth inválidas.');
+                    exit();
+                }
+                // Login bem-sucedido — continua sem persistir sessão entre requisições
+            } else {
+                $this->_responder(false, 'Erro: não foi possível fazer o upload. Usuário não autenticado.');
+                exit(); // ✅ CRÍTICO: Impede execução do index()
+            }
         }
 
         $this->load->model('core_model');
@@ -34,6 +47,11 @@ class UploadPictury extends CI_Controller
         $diretorioDestino = FCPATH . 'uploads' . DIRECTORY_SEPARATOR;
         $mensagem = '';
         $sucesso = false;
+
+        /* $sucesso = false;
+        $mensagem = 'TESTE DE RETORNO';
+        $this->_responder($sucesso, $mensagem);
+        return; */
 
         if (!extension_loaded('gd')) {
             $mensagem = 'Erro: A extensão GD do PHP não está habilitada.';
