@@ -35,7 +35,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.paineldb.rule=Host(`paineldb.stesistemas.com`) || Host(`www.paineldb.stesistemas.com`)" # Troque pelo seu dominio ou subdominio
       - "traefik.http.routers.paineldb.entrypoints=websecure"
-      - "traefik.http.routers.paineldb.tls.certresolver=le"
+      - "traefik.http.routers.paineldb.tls.certresolver=letsencrypt"
       - "traefik.http.services.paineldb.loadbalancer.server.port=80"
       - "traefik.http.routers.pma.tls=true"
     networks:
@@ -57,8 +57,8 @@ services:
       # DESENVOLVIMENTO: mapeia código local diretamente
       #- ./app_php:/var/www/html:cached  # cached para melhor performance
       # produção: volume separado para uploads se necessário
-      #- volume_wsjbjuaz_fotos:/var/www/html/uploads:delegated
-      - volume_jbjuaz:/var/www/html:cached  # cached para melhor performance
+      - volume_wsjbjuaz_fotos:/var/www/uploads:delegated
+      #- volume_jbjuaz:/var/www/html:cached  # cached para melhor performance
     networks:
       - jbjuaz
     environment:
@@ -71,7 +71,7 @@ services:
       - "traefik.http.routers.phpapp.rule=Host(`fbjuaz.stesistemas.com`)"
       - "traefik.http.routers.phpapp.entrypoints=websecure"
       - "traefik.http.routers.phpapp.tls=true"
-      - "traefik.http.routers.phpapp.tls.certresolver=le"
+      - "traefik.http.routers.phpapp.tls.certresolver=letsencrypt"
       
       # INSTRUÇÃO PARA O TRAEFIK:
       # A imagem php:7.4-apache roda internamente na porta 80
@@ -90,7 +90,7 @@ volumes:
   # Apenas volumes necessários que não são de desenvolvimento
   volume_db_data_jbjuaz:
     external: true
-  volume_jbjuaz:
+  volume_wsjbjuaz_fotos:
     external: true
 
    
