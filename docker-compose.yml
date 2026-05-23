@@ -33,7 +33,7 @@ services:
     restart: always 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.paineldb.rule=Host(`paineldb.stesistemas.com`) || Host(`www.paineldb.stesistemas.com`)" # Troque pelo seu dominio ou subdominio
+      - "traefik.http.routers.paineldb.rule=Host(`fbjuazeiromyadmin.stesistemas.com`)" # Troque pelo seu dominio ou subdominio
       - "traefik.http.routers.paineldb.entrypoints=websecure"
       - "traefik.http.routers.paineldb.tls.certresolver=letsencrypt"
       - "traefik.http.services.paineldb.loadbalancer.server.port=80"
@@ -68,7 +68,7 @@ services:
       - MYSQL_DATABASE=estacionamento_mysql
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.phpapp.rule=Host(`fbjuaz.stesistemas.com`)"
+      - "traefik.http.routers.phpapp.rule=Host(`fbjuazeiro.stesistemas.com`)"
       - "traefik.http.routers.phpapp.entrypoints=websecure"
       - "traefik.http.routers.phpapp.tls=true"
       - "traefik.http.routers.phpapp.tls.certresolver=letsencrypt"
