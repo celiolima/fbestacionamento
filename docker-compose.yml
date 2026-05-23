@@ -68,7 +68,7 @@ services:
       - MYSQL_DATABASE=estacionamento_mysql
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.phpapp.rule=Host(`fbjuazeiro.stesistemas.com`)"
+      - "traefik.http.routers.phpapp.rule=Host(`estacionamentofb.stesistemas.com`)"
       - "traefik.http.routers.phpapp.entrypoints=websecure"
       - "traefik.http.routers.phpapp.tls=true"
       - "traefik.http.routers.phpapp.tls.certresolver=letsencrypt"
