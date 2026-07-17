@@ -1,14 +1,13 @@
-
-
 services:
   mysql:
-    image: biarms/mysql:5.7-beta-circleci 
+    image: biarms/mysql:5.7-beta-circleci
     volumes:
       - volume_db_data_jbjuaz:/var/lib/mysql
     ports:
-      - 3306:3306
+      - "3307:3306"
     environment:
-      MYSQL_DATABASE: estacionamentojn
+      TZ: America/Sao_Paulo
+      MYSQL_DATABASE: estacionamento_mysql
       MYSQL_USER: root
       MYSQL_PASSWORD: root
       MYSQL_ROOT_PASSWORD: root
@@ -17,12 +16,12 @@ services:
       - jbjuaz
 
   phpmyadmin:
-    image: phpmyadmin:latest 
-    container_name: phpmyadmin    
+    image: phpmyadmin:latest
+    container_name: phpmyadmin
     depends_on:
       - mysql
     ports:
-      - 9080:80
+      - "9081:80"
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOST=mysql
@@ -30,67 +29,64 @@ services:
       - PMA_PASSWORD=root
     links:
       - mysql
-    restart: always 
+    restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.paineldb.rule=Host(`paineldb.stesistemas.com`) || Host(`www.paineldb.stesistemas.com`)" # Troque pelo seu dominio ou subdominio
+      - "traefik.http.routers.paineldb.rule=Host(`fbjuazeiromyadmin.stesistemas.com`)" # Troque pelo seu dominio ou subdominio
       - "traefik.http.routers.paineldb.entrypoints=websecure"
-      - "traefik.http.routers.paineldb.tls.certresolver=le"
+      - "traefik.http.routers.paineldb.tls.certresolver=letsencrypt"
       - "traefik.http.services.paineldb.loadbalancer.server.port=80"
       - "traefik.http.routers.pma.tls=true"
     networks:
       - jbjuaz
 
-
   phpapp:
     #image: php:7.4-apache
-    build:      
+    build:
       context: ./app_php
       dockerfile: Dockerfile
     container_name: phpapp
     depends_on:
-      - mysql      
+      - mysql
     restart: always
     ports:
-      - "8080:80"
+      - "8180:80"
     volumes:
       # DESENVOLVIMENTO: mapeia código local diretamente
-      #- ./app_php:/var/www/html:cached  # cached para melhor performance
+      #- ./app_php:/var/www/html:cached # cached para melhor performance
       # produção: volume separado para uploads se necessário
-      #- volume_wsjbjuaz_fotos:/var/www/html/uploads:delegated
-      - volume_jbjuaz:/var/www/html:cached  # cached para melhor performance
+      - volume_wsjbjuaz_fotos:/var/www/html/public/uploads:cached
+      #- volume_jbjuaz:/var/www/html:cached  # cached para melhor performance
     networks:
       - jbjuaz
     environment:
+      - TZ=America/Sao_Paulo
       - MYSQL_HOST=mysql
       - MYSQL_USER=root
       - MYSQL_PASSWORD=root
       - MYSQL_DATABASE=estacionamento_mysql
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.phpapp.rule=Host(`fbjuaz.stesistemas.com`)"
+      - "traefik.http.routers.phpapp.rule=Host(`estacionamentofb.stesistemas.com`)"
       - "traefik.http.routers.phpapp.entrypoints=websecure"
       - "traefik.http.routers.phpapp.tls=true"
-      - "traefik.http.routers.phpapp.tls.certresolver=le"
-      
+      - "traefik.http.routers.phpapp.tls.certresolver=letsencrypt"
+
       # INSTRUÇÃO PARA O TRAEFIK:
       # A imagem php:7.4-apache roda internamente na porta 80
       - "traefik.http.services.phpapp.loadbalancer.server.port=80"
-      
     #command: >
     #  sh -c "docker-php-ext-install pdo pdo_mysql && apache2-foreground"
     #
 
 
-networks: 
+networks:
   jbjuaz:
     external: true
 
 volumes:
   # Apenas volumes necessários que não são de desenvolvimento
   volume_db_data_jbjuaz:
-    external: true
-  volume_jbjuaz:
-    external: true
-
-   
+    name: volume_db_data_jbjuaz
+  volume_wsjbjuaz_fotos:
+    name: volume_wsjbjuaz_fotos

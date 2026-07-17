@@ -15,23 +15,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['excluir_selecionados']
             $this->core_model->delete('imagem_carro', array('id' => $idFoto)); // Exclui a foto do banco de dados
 
             $nomeFoto = $Foto->name;
-            $caminhoCompleto = $diretorioReal . DIRECTORY_SEPARATOR . basename($Foto->name);
+            $caminhoPub = FCPATH . 'public/uploads' . DIRECTORY_SEPARATOR . basename($Foto->name);
+            $caminhoAnt = FCPATH . 'uploads' . DIRECTORY_SEPARATOR . basename($Foto->name);
 
-
-            if ($caminhoCompleto && strpos($caminhoCompleto, $diretorioReal) === 0 && file_exists($caminhoCompleto)) {
-                
-                unlink($caminhoCompleto);
+            if (file_exists($caminhoPub)) {
+                unlink($caminhoPub);
+                $contagem++;
+            } elseif (file_exists($caminhoAnt)) {
+                unlink($caminhoAnt);
                 $contagem++;
             }
         }
         $mensagem = "Sucesso: $contagem foto(s) excluída(s).";
-        redirect(current_url());
+        $queryString = !empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '';
+        redirect('galeria' . $queryString);
     }
 }
-
-$arquivos = glob($diretorio . "*.{jpg,jpeg,JPG,JPEG}", GLOB_BRACE);
-if ($arquivos)
-    array_multisort(array_map('filemtime', $arquivos), SORT_DESC, $arquivos);
 ?>
 
 <div class="main-content">
@@ -110,28 +109,28 @@ if ($arquivos)
 
                                         <div class="form-group mb-3 mr-3">
                                             <label for="tipo">Sentido</label>
-                                            <select class="form-control" name="tipo" id="tipo" value="">
+                                            <select class="form-control" name="tipo" id="tipo">
                                                 <option value="">Todos</option>
-                                                <option value="entrada" <?= $this->input->get('tipo') == "entrada" ? "selected" : ""; ?>>Entrada</option>
-                                                <option value="saida" <?= $this->input->get('tipo') == "saida" ? "selected" : ""; ?>>Saida</option>
+                                                <option value="entrada" <?= !empty($filtros['tipo']) && $filtros['tipo'] == "entrada" ? "selected" : ""; ?>>Entrada</option>
+                                                <option value="saida" <?= !empty($filtros['tipo']) && $filtros['tipo'] == "saida" ? "selected" : ""; ?>>Saida</option>
                                             </select>
                                         </div>
 
                                         <div class="form-group mb-3 mr-3">
                                             <label for="data_inicial">Data Inicial</label>
-                                            <input class="form-control" type="datetime-local" name="data_inicial" autocomplete="off" id="data" placeholder="Data Inicial" value="<?= $this->input->get('data_inicial') ? $this->input->get('data_inicial') : date('Y-m-d\TH:i') ?>">
+                                            <input class="form-control" type="datetime-local" name="data_inicial" autocomplete="off" id="data" placeholder="Data Inicial" value="<?= !empty($filtros['data_inicial']) ? $filtros['data_inicial'] : '' ?>">
                                         </div>
                                         <div class="form-group mb-3">
                                             <label for="data_final">Data Final</label>
-                                            <input class="form-control" type="datetime-local" name="data_final" autocomplete="off" id="data2" placeholder="Data Final" value="<?= $this->input->get('data_final') ? $this->input->get('data_final') : date('Y-m-d\TH:i') ?>">
+                                            <input class="form-control" type="datetime-local" name="data_final" autocomplete="off" id="data2" placeholder="Data Final" value="<?= !empty($filtros['data_final']) ? $filtros['data_final'] : '' ?>">
                                         </div>
                                         <div class="form-group mb-3 ml-3">
-                                            <button class="button btn btn-mini btn-warning">
+                                            <button type="submit" class="button btn btn-mini btn-warning">
                                                 <span class="button__icon"><i class='bx bx-search-alt'></i></span>
                                                 <span class="button__text2">Pesquisar</span>
                                             </button>
                                             <a href="<?php echo base_url();  ?>galeria" class="button btn btn-mini btn-success" style="max-width: 140px">
-                                                <span class="button__icon"><i class='bx bx-plus-circle'></i></span><span class="button__text2">Limpa</span></a>
+                                                <span class="button__icon"><i class='bx bx-plus-circle'></i></span><span class="button__text2">Limpar</span></a>
                                         </div>
                                     </form>
                                     <!-- //fim formilario header -->
