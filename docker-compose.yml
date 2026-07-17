@@ -50,7 +50,7 @@ services:
       - mysql
     restart: always
     ports:
-      - "9081:80"
+      - "9080:80"
     volumes:
       # DESENVOLVIMENTO: mapeia código local diretamente
       #- ./app_php:/var/www/html:cached # cached para melhor performance
