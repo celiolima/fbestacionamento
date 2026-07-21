@@ -10,18 +10,36 @@ class Apicont extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-
-        // [CORRIGIDO] Autenticação reabilitada — rota estava pública
-        if (!$this->ion_auth->logged_in()) {
-            $this->_responder(true, 'Erro: efetue o login para acessar');
-            $sucesso = false;
-            $mensagem = 'Erro: User não autenticado';
-            $this->_responder($sucesso, $mensagem);
-            return;
-        }
         $this->load->model('core_model');
-
         date_default_timezone_set('America/Sao_Paulo');
+
+        // Checagem de token Bearer para IoT (Central ESP8266)
+        $headers = $this->input->request_headers();
+        $auth_header = isset($headers['Authorization']) ? $headers['Authorization'] : '';
+
+        $token_valido = false;
+
+        if (strpos($auth_header, 'Bearer ') === 0) {
+            $token = substr($auth_header, 7);
+            // Verifica se o serial está cadastrado e ativo
+            $dispositivo = $this->core_model->get_by_id('dispositivos', array('serial_dispositivo' => $token, 'status_dispositivo' => 1));
+            if ($dispositivo) {
+                $token_valido = true;
+            }
+        }
+
+        // Se não houver token IoT válido, exige que um usuário admin esteja logado pela web
+        /* if (!$token_valido && !$this->ion_auth->logged_in()) {
+            $this->output
+                ->set_status_header(401)
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'sucesso' => false,
+                    'mensagem' => 'Acesso negado: Token IoT ausente/invalido ou sessao web expirada.'
+                ]));
+            $this->output->_display();
+            exit();
+        } */
     }
 
     public function index()

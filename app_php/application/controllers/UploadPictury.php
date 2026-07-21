@@ -10,22 +10,36 @@ class UploadPictury extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->load->model('core_model');
+        date_default_timezone_set('America/Sao_Paulo');
 
-        // Permite requisições web logadas OU requisições IoT (POST / Headers / Basic Auth)
-        $autenticado = $this->ion_auth->logged_in();
-        if (!$autenticado) {
-            if ($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_SERVER['PHP_AUTH_USER']) || isset($_SERVER['HTTP_AUTHORIZATION']) || isset($_SERVER['HTTP_X_MEU_PARAMETRO']) || isset($_SERVER['HTTP_CAM'])) {
-                $autenticado = true;
+        // Checagem de token Bearer para IoT (Câmera ESP32-CAM)
+        $headers = $this->input->request_headers();
+        $auth_header = isset($headers['Authorization']) ? $headers['Authorization'] : '';
+        
+        $token_valido = false;
+        
+        if (strpos($auth_header, 'Bearer ') === 0) {
+            $token = substr($auth_header, 7);
+            // Verifica se o serial está cadastrado e ativo
+            $dispositivo = $this->core_model->get_by_id('dispositivos', array('serial_dispositivo' => $token, 'status_dispositivo' => 1));
+            if ($dispositivo) {
+                $token_valido = true;
             }
         }
 
-        if (!$autenticado) {
-            $this->_responder(false, 'Erro: Acesso restrito. Faça login ou envie via POST IoT.');
-            return;
+        // Se não houver token IoT válido, exige que um usuário admin esteja logado pela web (fallback)
+        if (!$token_valido && !$this->ion_auth->logged_in()) {
+            $this->output
+                ->set_status_header(401)
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'sucesso' => false,
+                    'mensagem' => 'Acesso negado: Token IoT ausente/invalido ou sessao web expirada.'
+                ]));
+            $this->output->_display();
+            exit();
         }
-
-        $this->load->model('core_model');
-        date_default_timezone_set('America/Sao_Paulo');
     }
 
     public function index()
@@ -34,12 +48,6 @@ class UploadPictury extends CI_Controller
         $diretorioDestino = FCPATH . 'public/uploads' . DIRECTORY_SEPARATOR;
         $mensagem = '';
         $sucesso = false;
-
-        if (!extension_loaded('gd')) {
-            $mensagem = 'Erro: A extensão GD do PHP não está habilitada.';
-            $this->_responder($sucesso, $mensagem);
-            return;
-        }
 
         // Garante que o diretório de destino existe
         if (!is_dir($diretorioDestino)) {
@@ -58,6 +66,8 @@ class UploadPictury extends CI_Controller
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $arquivo = null;
+            $is_raw = false;
+            
             if (!empty($_FILES)) {
                 $arquivo = reset($_FILES);
             } else {
@@ -72,6 +82,7 @@ class UploadPictury extends CI_Controller
                         'error' => UPLOAD_ERR_OK,
                         'size' => strlen($rawBody)
                     ];
+                    $is_raw = true;
                 }
             }
 
@@ -90,74 +101,48 @@ class UploadPictury extends CI_Controller
                 if ($arquivo['error'] === UPLOAD_ERR_OK) {
                     $finfo = new finfo(FILEINFO_MIME_TYPE);
                     $tipoMime = $finfo->file($arquivo['tmp_name']);
-                    $imgTest = @imagecreatefromjpeg($arquivo['tmp_name']);
 
-                    if ($tipoMime === 'image/jpeg' || $tipoMime === 'image/jpg' || $tipoMime === 'application/octet-stream' || $imgTest !== false) {
-                    $dataHora = date('d-m-Y_H-i-s');
-                    $novoNome = trim($type) . '_' . trim($cam) . '_' . $dataHora . '.jpg';
+                    // Validar se é realmente um JPEG sem carregar o GD inteiro
+                    if ($tipoMime === 'image/jpeg' || $tipoMime === 'image/jpg' || $tipoMime === 'application/octet-stream') {
+                        $dataHora = date('d-m-Y_H-i-s');
+                        $novoNome = trim($type) . '_' . trim($cam) . '_' . $dataHora . '.jpg';
+                        $caminhoFinal = $diretorioDestino . $novoNome;
 
-                    $caminhoFinal = $diretorioDestino . $novoNome;
+                        // Salva diretamente o arquivo original, removendo o gargalo de redimensionamento do GD
+                        $salvou = false;
+                        if ($is_raw) {
+                            $salvou = rename($arquivo['tmp_name'], $caminhoFinal);
+                        } else {
+                            $salvou = move_uploaded_file($arquivo['tmp_name'], $caminhoFinal);
+                        }
 
-                    $imgOriginal = $imgTest ? $imgTest : @imagecreatefromjpeg($arquivo['tmp_name']);
-
-                    if (!$imgOriginal) {
-                        $mensagem = 'Erro: Não foi possível processar a imagem.';
-                        $this->_responder($sucesso, $mensagem);
-                        return;
+                        if ($salvou) {
+                            $insetDb = true;
+                        } else {
+                            $mensagem = 'Erro ao salvar a imagem no servidor (permissão ou disco).';
+                        }
+                    } else {
+                        $mensagem = 'Apenas arquivos JPEG são aceitos.';
                     }
+                } else {
+                    $mensagem = 'Erro no upload do arquivo (código: ' . $arquivo['error'] . ').';
+                }
 
-                    $larguraOriginal = imagesx($imgOriginal);
-                    $alturaOriginal = imagesy($imgOriginal);
-
-                    $novaAltura = 400;
-                    $novaLargura = (int) floor($larguraOriginal * ($novaAltura / $alturaOriginal));
-
-                    $imgRedimensionada = imagecreatetruecolor($novaLargura, $novaAltura);
-
-                    imagecopyresampled(
-                        $imgRedimensionada,
-                        $imgOriginal,
-                        0,
-                        0,
-                        0,
-                        0,
-                        $novaLargura,
-                        $novaAltura,
-                        $larguraOriginal,
-                        $alturaOriginal
+                if ($insetDb) {
+                    // Salva informações no banco de dados com a data/hora exata do Brasil
+                    $data = array(
+                        'name'       => $novoNome,
+                        'dirImage'   => 'public/uploads/' . $novoNome,
+                        'type'       => $type,
+                        'created_at' => date('Y-m-d H:i:s')
                     );
 
-                    if (imagejpeg($imgRedimensionada, $caminhoFinal, 90)) {
-                        $insetDb = true;
-                    } else {
-                        $mensagem = 'Erro ao salvar a imagem no servidor.';
-                    }
-
-                    imagedestroy($imgOriginal);
-                    imagedestroy($imgRedimensionada);
-                } else {
-                    $mensagem = 'Apenas arquivos JPEG são aceitos.';
+                    $insert = $this->core_model->insert('imagem_carro', $data, true);
+                    $sucesso = true;
+                    $mensagem = 'Sucesso! Foto salva direto no disco e registrada no banco: ' . $novoNome;
+                    $this->_responder($sucesso, $mensagem);
+                    return;
                 }
-            } else {
-                $mensagem = 'Erro no upload do arquivo (código: ' . $arquivo['error'] . ').';
-            }
-
-            if ($insetDb) {
-                $this->load->model('core_model');
-                // Salva informações no banco de dados com a data/hora exata do Brasil e sem espaços na chave
-                $data = array(
-                    'name'       => $novoNome,
-                    'dirImage'   => 'public/uploads/' . $novoNome,
-                    'type'       => $type,
-                    'created_at' => date('Y-m-d H:i:s')
-                );
-
-                $insert = $this->core_model->insert('imagem_carro', $data, true);
-                $sucesso = true;
-                $mensagem = 'Sucesso! Foto salva, redimensionada e registrada no banco: ' . $novoNome;
-                $this->_responder($sucesso, $mensagem);
-                return;
-            }
             } else {
                 $mensagem = 'Erro: Nenhum arquivo enviado no POST.';
             }

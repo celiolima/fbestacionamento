@@ -41,6 +41,9 @@
                         <a title="Listar usuários" href="<?php echo base_url('usuarios'); ?>"><i class="ik ik-users"></i><span>Usuários</span></a>
                     </div>
                     <div class="nav-item">
+                        <a title="Gerenciar dispositivos IoT" href="<?php echo base_url('dispositivos'); ?>"><i class="fas fa-microchip"></i><span>Dispositivos IoT</span></a>
+                    </div>
+                    <div class="nav-item">
                         <a title="Gerenciar configurações do sistema" href="<?php echo base_url('sistema'); ?>"><i class="ik ik-settings"></i><span>Sistema</span></a>
                     </div>
                       <div class="nav-item">
