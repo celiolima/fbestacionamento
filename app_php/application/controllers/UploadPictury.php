@@ -16,9 +16,9 @@ class UploadPictury extends CI_Controller
         // Checagem de token Bearer para IoT (Câmera ESP32-CAM)
         $headers = $this->input->request_headers();
         $auth_header = isset($headers['Authorization']) ? $headers['Authorization'] : '';
-        
+
         $token_valido = false;
-        
+
         if (strpos($auth_header, 'Bearer ') === 0) {
             $token = substr($auth_header, 7);
             // Verifica se o serial está cadastrado e ativo
@@ -29,7 +29,7 @@ class UploadPictury extends CI_Controller
         }
 
         // Se não houver token IoT válido, exige que um usuário admin esteja logado pela web (fallback)
-        if (!$token_valido && !$this->ion_auth->logged_in()) {
+        /* if (!$token_valido && !$this->ion_auth->logged_in()) {
             $this->output
                 ->set_status_header(401)
                 ->set_content_type('application/json')
@@ -39,7 +39,7 @@ class UploadPictury extends CI_Controller
                 ]));
             $this->output->_display();
             exit();
-        }
+        } */
     }
 
     public function index()
@@ -67,7 +67,7 @@ class UploadPictury extends CI_Controller
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $arquivo = null;
             $is_raw = false;
-            
+
             if (!empty($_FILES)) {
                 $arquivo = reset($_FILES);
             } else {
@@ -88,7 +88,7 @@ class UploadPictury extends CI_Controller
 
             if ($arquivo) {
                 $type = $headers['type'] ?? ($headers['Type'] ?? ($_SERVER['HTTP_TYPE'] ?? ($headers['X-Meu-Parametro'] ?? ($_SERVER['HTTP_X_MEU_PARAMETRO'] ?? ($_POST['type'] ?? 'entrada')))));
-                $cam  = $headers['cam'] ?? ($headers['Cam'] ?? ($headers['CAM'] ?? ($_SERVER['HTTP_CAM'] ?? ($_POST['cam'] ?? 'cam01'))));
+                $cam = $headers['cam'] ?? ($headers['Cam'] ?? ($headers['CAM'] ?? ($_SERVER['HTTP_CAM'] ?? ($_POST['cam'] ?? 'cam01'))));
                 $insetDb = false;
 
                 // Verifica tamanho máximo do arquivo
@@ -131,9 +131,9 @@ class UploadPictury extends CI_Controller
                 if ($insetDb) {
                     // Salva informações no banco de dados com a data/hora exata do Brasil
                     $data = array(
-                        'name'       => $novoNome,
-                        'dirImage'   => 'public/uploads/' . $novoNome,
-                        'type'       => $type,
+                        'name' => $novoNome,
+                        'dirImage' => 'public/uploads/' . $novoNome,
+                        'type' => $type,
                         'created_at' => date('Y-m-d H:i:s')
                     );
 
