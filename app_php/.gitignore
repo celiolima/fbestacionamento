@@ -25,5 +25,3 @@ vendor/
 .php_cs.cache
 
 ci_sessions/
-
-
