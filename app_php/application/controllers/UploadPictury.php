@@ -10,7 +10,7 @@ class UploadPictury extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        
+
         // Libera CORS para qualquer tipo de requisição/origem
         header("Access-Control-Allow-Origin: *");
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
@@ -38,18 +38,18 @@ class UploadPictury extends CI_Controller
         }
 
         // Se não houver token IoT válido, exige que um usuário admin esteja logado pela web (fallback)
-        if (!$token_valido && !$this->ion_auth->logged_in()) {
-            $this->_registrar_log('FALHA', 'Acesso negado: Token IoT ausente/invalido ou sessao web expirada');
-            $this->output
-                ->set_status_header(401)
-                ->set_content_type('application/json')
-                ->set_output(json_encode([
-                    'sucesso' => false,
-                    'mensagem' => 'Acesso negado: Token IoT ausente/invalido ou sessao web expirada.'
-                ]));
-            $this->output->_display();
-            exit();
-        }
+        /*  if (!$token_valido && !$this->ion_auth->logged_in()) {
+             $this->_registrar_log('FALHA', 'Acesso negado: Token IoT ausente/invalido ou sessao web expirada');
+             $this->output
+                 ->set_status_header(401)
+                 ->set_content_type('application/json')
+                 ->set_output(json_encode([
+                     'sucesso' => false,
+                     'mensagem' => 'Acesso negado: Token IoT ausente/invalido ou sessao web expirada.'
+                 ]));
+             $this->output->_display();
+             exit();
+         } */
     }
 
     public function index()
@@ -228,7 +228,7 @@ class UploadPictury extends CI_Controller
         $ip = $this->input->ip_address();
         $data_hora = date('Y-m-d H:i:s');
         $endpoint = 'UploadPictury (Câmera)';
-        
+
         $logMsg = "[{$data_hora}] IP: {$ip} | Endpoint: {$endpoint} | Status: {$status} | Motivo: {$motivo}\n";
         @file_put_contents($logPath, $logMsg, FILE_APPEND);
     }
