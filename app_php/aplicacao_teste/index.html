@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32-CAM Simulator</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Painel de Formulário -->
+        <div class="panel form-panel">
+            <div class="header">
+                <h1>ESP32-CAM <span>Simulator</span></h1>
+                <p>Envie fotos e parâmetros para a API IoT (UploadPictury)</p>
+            </div>
+            
+            <form id="simulatorForm">
+                <div class="form-group">
+                    <label for="serverUrl">URL do Servidor API</label>
+                    <input type="url" id="serverUrl" name="serverUrl" value="http://localhost:9080/uploadPictury" required placeholder="Ex: https://estacionamentofb.stesistemas.com/uploadPictury">
+                </div>
+
+                <div class="form-group">
+                    <label for="token">Token IoT (Bearer)</label>
+                    <input type="text" id="token" name="token" required placeholder="Insira o serial do dispositivo">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="type">Tipo</label>
+                        <select id="type" name="type" required>
+                            <option value="entrada">Entrada</option>
+                            <option value="saida">Saída</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group half">
+                        <label for="cam">Câmera</label>
+                        <select id="cam" name="cam" required>
+                            <option value="cam01">cam01</option>
+                            <option value="cam02">cam02</option>
+                            <option value="cam03">cam03</option>
+                            <option value="cam04">cam04</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="foto">Foto (.jpg / .jpeg)</label>
+                    <div class="file-drop-area">
+                        <span class="file-msg">Arraste uma imagem ou clique para selecionar</span>
+                        <input type="file" id="foto" name="foto" accept="image/jpeg, image/jpg" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="btnSubmit">
+                    <span>Simular Disparo</span>
+                    <div class="loader" id="loader"></div>
+                </button>
+            </form>
+        </div>
+
+        <!-- Painel de Terminal -->
+        <div class="panel terminal-panel">
+            <div class="terminal-header">
+                <div class="mac-btns">
+                    <span></span><span></span><span></span>
+                </div>
+                <div class="terminal-title">Terminal Console</div>
+            </div>
+            <div class="terminal-body" id="terminalOutput">
+                <div class="log line-info">>> Sistema Iniciado. Aguardando disparos...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

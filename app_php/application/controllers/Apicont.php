@@ -10,6 +10,15 @@ class Apicont extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+
+        // Libera CORS para qualquer tipo de requisição/origem
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+        header("Access-Control-Allow-Headers: *");
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            exit();
+        }
+
         $this->load->model('core_model');
         date_default_timezone_set('America/Sao_Paulo');
 
@@ -29,7 +38,8 @@ class Apicont extends CI_Controller
         }
 
         // Se não houver token IoT válido, exige que um usuário admin esteja logado pela web
-        /* if (!$token_valido && !$this->ion_auth->logged_in()) {
+        if (!$token_valido && !$this->ion_auth->logged_in()) {
+            $this->_registrar_log('FALHA', 'Acesso negado: Token IoT ausente/invalido ou sessao web expirada');
             $this->output
                 ->set_status_header(401)
                 ->set_content_type('application/json')
@@ -39,7 +49,7 @@ class Apicont extends CI_Controller
                 ]));
             $this->output->_display();
             exit();
-        } */
+        }
     }
 
     public function index()
@@ -91,6 +101,7 @@ class Apicont extends CI_Controller
 
             $sucesso = true;
             $mensagem = 'Dados atualizados com sucesso';
+            $this->_registrar_log('SUCESSO', 'Contagem atualizada (condicao inicial)');
             $this->_responder($sucesso, $dados);
             return;
         }
@@ -143,6 +154,7 @@ class Apicont extends CI_Controller
         if ($dados === null) {
             $sucesso = false;
             $mensagem = 'Erro: JSON inválido';
+            $this->_registrar_log('FALHA', 'JSON invalido');
             $this->_responder($sucesso, $mensagem);
             return;
         } else {
@@ -164,6 +176,7 @@ class Apicont extends CI_Controller
 
             $sucesso = true;
             $mensagem = 'Dados atualizados com sucesso';
+            $this->_registrar_log('SUCESSO', 'Contagem atualizada');
             $this->_responder($sucesso, $dados);
             return;
         }
@@ -180,5 +193,19 @@ class Apicont extends CI_Controller
                 'sucesso' => $sucesso,
                 'mensagem' => $mensagem
             ]));
+    }
+
+    /**
+     * Registra log de acesso IoT
+     */
+    private function _registrar_log($status, $motivo = '')
+    {
+        $logPath = APPPATH . 'logs/api_iot.log';
+        $ip = $this->input->ip_address();
+        $data_hora = date('Y-m-d H:i:s');
+        $endpoint = 'Apicont (Contagem)';
+
+        $logMsg = "[{$data_hora}] IP: {$ip} | Endpoint: {$endpoint} | Status: {$status} | Motivo: {$motivo}\n";
+        @file_put_contents($logPath, $logMsg, FILE_APPEND);
     }
 }

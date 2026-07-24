@@ -10,6 +10,15 @@ class UploadPictury extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        
+        // Libera CORS para qualquer tipo de requisição/origem
+        header("Access-Control-Allow-Origin: *");
+        header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+        header("Access-Control-Allow-Headers: *");
+        if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+            exit();
+        }
+
         $this->load->model('core_model');
         date_default_timezone_set('America/Sao_Paulo');
 
@@ -29,7 +38,8 @@ class UploadPictury extends CI_Controller
         }
 
         // Se não houver token IoT válido, exige que um usuário admin esteja logado pela web (fallback)
-        /* if (!$token_valido && !$this->ion_auth->logged_in()) {
+        if (!$token_valido && !$this->ion_auth->logged_in()) {
+            $this->_registrar_log('FALHA', 'Acesso negado: Token IoT ausente/invalido ou sessao web expirada');
             $this->output
                 ->set_status_header(401)
                 ->set_content_type('application/json')
@@ -39,7 +49,7 @@ class UploadPictury extends CI_Controller
                 ]));
             $this->output->_display();
             exit();
-        } */
+        }
     }
 
     public function index()
@@ -53,6 +63,7 @@ class UploadPictury extends CI_Controller
         if (!is_dir($diretorioDestino)) {
             if (!mkdir($diretorioDestino, 0777, true)) {
                 $mensagem = 'Erro: Não foi possível criar o diretório de uploads.';
+                $this->_registrar_log('FALHA', $mensagem);
                 $this->_responder($sucesso, $mensagem);
                 return;
             }
@@ -94,6 +105,7 @@ class UploadPictury extends CI_Controller
                 // Verifica tamanho máximo do arquivo
                 if ($arquivo['size'] > self::MAX_FILE_SIZE) {
                     $mensagem = 'Erro: O arquivo excede o tamanho máximo permitido de 5 MB.';
+                    $this->_registrar_log('FALHA', $mensagem);
                     $this->_responder($sucesso, $mensagem);
                     return;
                 }
@@ -120,12 +132,15 @@ class UploadPictury extends CI_Controller
                             $insetDb = true;
                         } else {
                             $mensagem = 'Erro ao salvar a imagem no servidor (permissão ou disco).';
+                            $this->_registrar_log('FALHA', $mensagem);
                         }
                     } else {
                         $mensagem = 'Apenas arquivos JPEG são aceitos.';
+                        $this->_registrar_log('FALHA', $mensagem);
                     }
                 } else {
                     $mensagem = 'Erro no upload do arquivo (código: ' . $arquivo['error'] . ').';
+                    $this->_registrar_log('FALHA', $mensagem);
                 }
 
                 if ($insetDb) {
@@ -140,11 +155,13 @@ class UploadPictury extends CI_Controller
                     $insert = $this->core_model->insert('imagem_carro', $data, true);
                     $sucesso = true;
                     $mensagem = 'Sucesso! Foto salva direto no disco e registrada no banco: ' . $novoNome;
+                    $this->_registrar_log('SUCESSO', 'Foto salva: ' . $novoNome);
                     $this->_responder($sucesso, $mensagem);
                     return;
                 }
             } else {
                 $mensagem = 'Erro: Nenhum arquivo enviado no POST.';
+                $this->_registrar_log('FALHA', $mensagem);
             }
         } else {
             // Exibe apenas o formulário HTML limpo se não for POST
@@ -200,5 +217,19 @@ class UploadPictury extends CI_Controller
                 </form>
             </body>
             </html>';
+    }
+
+    /**
+     * Registra log de acesso IoT
+     */
+    private function _registrar_log($status, $motivo = '')
+    {
+        $logPath = APPPATH . 'logs/api_iot.log';
+        $ip = $this->input->ip_address();
+        $data_hora = date('Y-m-d H:i:s');
+        $endpoint = 'UploadPictury (Câmera)';
+        
+        $logMsg = "[{$data_hora}] IP: {$ip} | Endpoint: {$endpoint} | Status: {$status} | Motivo: {$motivo}\n";
+        @file_put_contents($logPath, $logMsg, FILE_APPEND);
     }
 }
