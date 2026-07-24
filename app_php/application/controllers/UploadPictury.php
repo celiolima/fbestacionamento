@@ -38,18 +38,18 @@ class UploadPictury extends CI_Controller
         }
 
         // Se não houver token IoT válido, exige que um usuário admin esteja logado pela web (fallback)
-        /*  if (!$token_valido && !$this->ion_auth->logged_in()) {
-             $this->_registrar_log('FALHA', 'Acesso negado: Token IoT ausente/invalido ou sessao web expirada');
-             $this->output
-                 ->set_status_header(401)
-                 ->set_content_type('application/json')
-                 ->set_output(json_encode([
-                     'sucesso' => false,
-                     'mensagem' => 'Acesso negado: Token IoT ausente/invalido ou sessao web expirada.'
-                 ]));
-             $this->output->_display();
-             exit();
-         } */
+        if (!$token_valido && !$this->ion_auth->logged_in()) {
+            $this->_registrar_log('FALHA', 'Acesso negado: Token IoT ausente/invalido ou sessao web expirada');
+            $this->output
+                ->set_status_header(401)
+                ->set_content_type('application/json')
+                ->set_output(json_encode([
+                    'sucesso' => false,
+                    'mensagem' => 'Acesso negado: Token IoT ausente/invalido ou sessao web expirada.'
+                ]));
+            $this->output->_display();
+            exit();
+        }
     }
 
     public function index()
