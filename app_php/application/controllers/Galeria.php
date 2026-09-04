@@ -50,28 +50,11 @@ class Galeria extends CI_Controller
             $where['type'] = $tipo;
         }
 
-        $condition = !empty($where) ? $where : NULL;
+        $results = array();
 
-        $results = $this->galeria_model->get_all('imagem_carro', $condition);
-
-        if (!empty($results) && (!empty($de) || !empty($ate))) {
-            $ts_de = !empty($de) ? strtotime(str_replace('T', ' ', $de)) : 0;
-            $ts_ate = !empty($ate) ? strtotime(str_replace('T', ' ', $ate) . (strlen($ate) <= 10 ? ' 23:59:59' : '')) : PHP_INT_MAX;
-
-            $filtered_results = array();
-            foreach ($results as $foto) {
-                $ts_foto = strtotime($foto->created_at);
-                if (preg_match('/(\d{2})-(\d{2})-(\d{4})[_\s-](\d{2})[-:](\d{2})[-:](\d{2})/', $foto->name, $matches)) {
-                    $ts_foto = strtotime("{$matches[3]}-{$matches[2]}-{$matches[1]} {$matches[4]}:{$matches[5]}:{$matches[6]}");
-                } elseif (preg_match('/(\d{2})-(\d{2})-(\d{4})/', $foto->name, $matches)) {
-                    $ts_foto = strtotime("{$matches[3]}-{$matches[2]}-{$matches[1]} 12:00:00");
-                }
-
-                if ($ts_foto >= $ts_de && $ts_foto <= $ts_ate) {
-                    $filtered_results[] = $foto;
-                }
-            }
-            $results = $filtered_results;
+        // Só realiza a consulta se pelo menos um filtro foi preenchido
+        if (!empty($where)) {
+            $results = $this->galeria_model->get_all('imagem_carro', $where);
         }
 
         $data = array(
